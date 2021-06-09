@@ -20,10 +20,30 @@ In order to make reproducible the analysis run by BU_ISCIII, here we describe st
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with Docker containers making installation trivial and results highly reproducible. Furthermore, automated continuous integration tests that run the pipeline on a full-sized dataset using AWS cloud ensure that the code is stable.
 
 ## Local data organization summary
+Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-Cov) and the name of the researcher, typically "SRVxxxx_date_SARS_name-researcher". 
+In this folder there will be other directories: 
+ANALYSIS  DOC  RAW  REFERENCES  RESULTS  TMP
+
+In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN  there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP are empty. 
+
+ANALYSIS_folder
+
+00-reads. Here there is a Lablog file which has the commands to be executed to make symbolic links to every RAW/RUN_xxx/R1/2.fastq.gz files to be analysed.
+
+Lablog -> It contains the commands necesarry to make the sample_id.txt file, which is derived from all the samples located in the RAW folder.
+It also has the commands to create the other two folders in whicc the analysis will be splited:
+
+date_ANALYSIS01_AMPLICONS_HUMAN. 
+    Lablog -> 1) Make symbolic links eith 00-reads folder and samples_id.txt file. 2º) In addition, it contains the command necessary to perform the samplesheet.csv file;3º) the main nextflow command to run the variant analysis of SARS using viralrecon and kraken2 (wich will be located in the _01_viral_recon_mapping.sh bash file. 4º) Copy the bash script "create_summary_report.sh" and the python script percentajeNs.py from the "proccessin_Data/Bioinformatics/services_and_colaborations" folder. *) There is a commented command in this lablog for the assembly, but we dont run it. 
+    
+date_ANALYSIS02_MET.                  
+
+samples_id.txt.
 
 
 1. Analysis_01 -> Lablog 
-2. Where the lablog of the previous services has to be located. This lablog makes symbolic links with 00-reads folder and samples_id.txt file, which contain the raw data (Fastqc format) and sample names respectively, which are going to be analyzed. 
+2. Where the lablog of the previous services has to be located. This lablog makes symbolic links with 00-reads folder and samples_id.txt file, which contain the raw data (Fastqc format) and sample names respectively, which are going to be analyzed.
+3. 
   A. First, the lablog create a csv file format which is the samplesheet file, to be taken by viralrecon pipeline. 
   B. 
 
