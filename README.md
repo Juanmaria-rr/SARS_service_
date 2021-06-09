@@ -1,4 +1,4 @@
-# viralrecon_BU-ISCIII
+# SARS-service_BU-ISCIII
 
 
 [![GitHub Actions CI Status](https://github.com/nf-core/viralrecon/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/viralrecon/actions)
