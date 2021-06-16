@@ -1138,11 +1138,11 @@ Summary of resulting data:
 
 ## Results and statistics. 
 
-From the files generated after the two analyses (viralrecon and metagenomics), the next aim is to extract and mount in a tab separated file different data from both analyses that will give an overview of the metrics and summary results. 
+From the files generated after the two analyses (viralrecon and metagenomics), the next aim is to extract and mount in a tab separated file different data from both analyses that will give an overview of the metrics and summary results for every analyzed sample.
 
 
-Host (Human/bison)
-VirusSequence (reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2
+Host 
+VirusSequence (reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2)
 Sample
 Total reads (*.sorted.bam.flagstat)
 Reads_host R1 (*.kraken2.report.txt)
@@ -1157,7 +1157,30 @@ PCT_10X (*.trim.CollectWgsMetrics.coverage_metrics)
 Variants_consensusx10 (*.AF0.75.snpSift.table.txt)
 Missense_variants (*.AF0.75.snpSift.table.txt)
 %Ns_10x (_Python_script)
-Lineage (Pangolin software)
+Lineage (Pangolin)
+
+| Info | Source |
+| --- | --- |
+| `Host` | Human, Bison or bat |
+| `VirusSequence` | Reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2 |
+| `Total reads` | .sorted.bam.flagstat |
+| `Reads_host_R1` | *.kraken2.report.txt |
+| `Reads_host_total` | 
+| `%_reads_host` | *.kraken.report.txt |
+| `Reads_virus_total` |
+| `%_reads_virus` | .sorted.bam.flagstat |
+| `Unmapped_reads` |
+| `%Unmapped_reads` |
+| `Mean DP Coverage ` | *.trim.CollectWgsMetrics.coverage_metrics |
+| `PCT_10X` | *.trim.CollectWgsMetrics.coverage_metrics |
+| `Variants_consensusx10` | *.AF0.75.snpSift.table.txt | 
+| `Missense_variants` | *.AF0.75.snpSift.table.txt | 
+| `%Ns_10x` | _Python_script |
+| `Lineage` | Pangolin |
+
+
+
+
 
 
 
