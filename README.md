@@ -24,13 +24,17 @@ Once every service is ordered, a template of data structure is created, starting
 In this folder there will be other directories: 
 
 ```ruby
-.
 ├── ANALYSIS
+│   ├── 00-reads
+│   ├── <date>_ANALYSIS01_AMPLICONS_HUMAN
+│   └── <date>_ANALYSIS02_MET
 ├── DOC
 ├── RAW
+│   └── <samples_folder>
 ├── REFERENCES
 ├── RESULTS
 └── TMP
+
 ```
 
 In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN  there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty. 
