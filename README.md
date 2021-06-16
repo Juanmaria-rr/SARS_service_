@@ -207,6 +207,7 @@ date_viralrecon_mapping
   <summary>Click here to see the Summary of the resulting data structure from virarecon_mapping folder</summary>
     
 ** Only directories.
+
 ```ruby
 .
 ├── assembly
@@ -286,6 +287,7 @@ date_viralrecon_mapping
         │       ├── genome_stats
         │       └── icarus_viewers
         └── snpeff
+```
 </details>
 
     
