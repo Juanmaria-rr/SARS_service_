@@ -159,7 +159,45 @@ Once this, we are ready to run viralrecon analysis, which will be launched using
 ```ruby
 nohup bash _01_viralrecon_mapping.sh &> $(date '+%Y%m%d')_mapping01.log &
 ```
+
 As you may note, the output from the viralrecon pipeline is directed to a .log file, that will allow us to follow in real time the process while our console will be free to run other tasks. Do ```ruby tail -f $(date '+%Y%m%d')_mapping01.log ``` to supervise the pipeline. 
+
+
+<details>
+    <summary> Click if you want to see a brief summary to the generic pipeline of viralrecon </summary>
+## Pipeline summary
+
+Regarding the Analysis of variants (folder Analysis_01), samples are processed and analysed using viralrecon pipeline, which is run as follows: 
+
+1. Download samples via SRA, ENA or GEO ids ([`ENA FTP`](https://ena-docs.readthedocs.io/en/latest/retrieval/file-download.html), [`parallel-fastq-dump`](https://github.com/rvalieris/parallel-fastq-dump); *if required*)
+2. Merge re-sequenced FastQ files ([`cat`](http://www.linfo.org/cat.html); *if required*)
+3. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+4. Adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
+5. Variant calling
+    1. Read alignment ([`Bowtie 2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
+    2. Sort and index alignments ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+    3. Primer sequence removal ([`iVar`](https://github.com/andersen-lab/ivar); *amplicon data only*)
+    4. Duplicate read marking ([`picard`](https://broadinstitute.github.io/picard/); *removal optional*)
+    5. Alignment-level QC ([`picard`](https://broadinstitute.github.io/picard/), [`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+    6. Genome-wide and amplicon coverage QC plots ([`mosdepth`](https://github.com/brentp/mosdepth/))
+    7. Choice of multiple variant calling and consensus sequence generation routes ([`VarScan 2`](http://dkoboldt.github.io/varscan/), [`BCFTools`](http://samtools.github.io/bcftools/bcftools.html), [`BEDTools`](https://github.com/arq5x/bedtools2/) *||* [`iVar variants and consensus`](https://github.com/andersen-lab/ivar) *||* [`BCFTools`](http://samtools.github.io/bcftools/bcftools.html), [`BEDTools`](https://github.com/arq5x/bedtools2/))
+        * Variant annotation ([`SnpEff`](http://snpeff.sourceforge.net/SnpEff.html), [`SnpSift`](http://snpeff.sourceforge.net/SnpSift.html))
+        * Consensus assessment report ([`QUAST`](http://quast.sourceforge.net/quast))
+    8. Intersect variants across callers ([`BCFTools`](http://samtools.github.io/bcftools/bcftools.html))
+6. _De novo_ assembly
+    1. Primer trimming ([`Cutadapt`](https://cutadapt.readthedocs.io/en/stable/guide.html); *amplicon data only*)
+    2. Removal of host reads ([`Kraken 2`](http://ccb.jhu.edu/software/kraken2/))
+    3. Choice of multiple assembly tools ([`SPAdes`](http://cab.spbu.ru/software/spades/) *||* [`metaSPAdes`](http://cab.spbu.ru/software/meta-spades/) *||* [`Unicycler`](https://github.com/rrwick/Unicycler) *||* [`minia`](https://github.com/GATB/minia))
+        * Blast to reference genome ([`blastn`](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch))
+        * Contiguate assembly ([`ABACAS`](https://www.sanger.ac.uk/science/tools/pagit))
+        * Assembly report ([`PlasmidID`](https://github.com/BU-ISCIII/plasmidID))
+        * Assembly assessment report ([`QUAST`](http://quast.sourceforge.net/quast))
+        * Call variants relative to reference ([`Minimap2`](https://github.com/lh3/minimap2), [`seqwish`](https://github.com/ekg/seqwish), [`vg`](https://github.com/vgteam/vg), [`Bandage`](https://github.com/rrwick/Bandage))
+        * Variant annotation ([`SnpEff`](http://snpeff.sourceforge.net/SnpEff.html), [`SnpSift`](http://snpeff.sourceforge.net/SnpSift.html))
+7. Present QC and visualisation for raw read, alignment, assembly and variant calling results ([`MultiQC`](http://multiqc.info/))
+
+</details>
+
 
 After this, a new folder will be created, named /$(date '+%Y%m%d')_viralrecon_mapping, where every output from the pipeline will be located, with the following structure. In addition, nextflow will create the folder /work, in which every task is isolated in folders. 
 
@@ -250,15 +288,7 @@ date_viralrecon_mapping
     │   │   └── icarus_viewers
     │   └── snpeff
     ├── intersect
-    │   ├── Sample_1
-    │   ├── Sample_2
-    │   ├── Sample_3
-    │   ├── Sample_4
-    │   ├── Sample_5
-    │   ├── Sample_6
-    │   ├── Sample_7
-    │   ├── Sample_8
-    │   └── Sample_9
+    │   └── Sample_name
     ├── ivar
     │   ├── bcftools_stats
     │   ├── consensus
@@ -721,13 +751,11 @@ date_viralrecon_mapping
 ----------------------
 
 
-date_ANALYSIS02_MET.    
-└──  lablog
-
+/date_ANALYSIS02_MET.    
 
 **Lablog
 
-Includes the commands to construct symbolic links with 00-reads and samples_id.txt files from the main "Analysis" directory. It also has the nextflow run command neccesary to perform the metagenomic analysis using the main.nf file using the mag repository data taken from "/processing_Data/bioinformatics/pipelines/mag/main.nf", to make date_mag folder and performed the metagnomic classification using Kraken from "/processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz" included in the _01_mag.sh. As in viralrecon analysis, the output of _01_mag.sh will be redirected to a .log in order to follow the run. The content of the lablog is shown in the following lines: 
+Includes the commands to make symbolic links with 00-reads and samples_id.txt files from the main "Analysis" directory. It also has the nextflow run command neccesary to perform the metagenomic analysis using the main.nf file using the mag repository data taken from "/processing_Data/bioinformatics/pipelines/mag/main.nf", to make date_mag folder and performed the metagnomic classification using Kraken from "/processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz" included in the _01_mag.sh. As in viralrecon analysis, the output of _01_mag.sh will be redirected to a .log in order to follow the run. The content of the lablog is shown in the following lines: 
 
 ```ruby
 ln -s ../00-reads .
@@ -779,40 +807,7 @@ Now, /$(date '+%Y%m%d')_mag folder include the next directories regarding metagn
     └── kraken2
         ├── <sample_name>
 ```
-<details>
-    <summary> Click if you want to see a brief summary to the generic pipeline of viralrecon </summary>
-## Pipeline summary
 
-Regarding the Analysis of variants (folder Analysis_01), samples are processed and analysed using viralrecon pipeline, which is run as follows: 
-
-1. Download samples via SRA, ENA or GEO ids ([`ENA FTP`](https://ena-docs.readthedocs.io/en/latest/retrieval/file-download.html), [`parallel-fastq-dump`](https://github.com/rvalieris/parallel-fastq-dump); *if required*)
-2. Merge re-sequenced FastQ files ([`cat`](http://www.linfo.org/cat.html); *if required*)
-3. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-4. Adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
-5. Variant calling
-    1. Read alignment ([`Bowtie 2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
-    2. Sort and index alignments ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-    3. Primer sequence removal ([`iVar`](https://github.com/andersen-lab/ivar); *amplicon data only*)
-    4. Duplicate read marking ([`picard`](https://broadinstitute.github.io/picard/); *removal optional*)
-    5. Alignment-level QC ([`picard`](https://broadinstitute.github.io/picard/), [`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-    6. Genome-wide and amplicon coverage QC plots ([`mosdepth`](https://github.com/brentp/mosdepth/))
-    7. Choice of multiple variant calling and consensus sequence generation routes ([`VarScan 2`](http://dkoboldt.github.io/varscan/), [`BCFTools`](http://samtools.github.io/bcftools/bcftools.html), [`BEDTools`](https://github.com/arq5x/bedtools2/) *||* [`iVar variants and consensus`](https://github.com/andersen-lab/ivar) *||* [`BCFTools`](http://samtools.github.io/bcftools/bcftools.html), [`BEDTools`](https://github.com/arq5x/bedtools2/))
-        * Variant annotation ([`SnpEff`](http://snpeff.sourceforge.net/SnpEff.html), [`SnpSift`](http://snpeff.sourceforge.net/SnpSift.html))
-        * Consensus assessment report ([`QUAST`](http://quast.sourceforge.net/quast))
-    8. Intersect variants across callers ([`BCFTools`](http://samtools.github.io/bcftools/bcftools.html))
-6. _De novo_ assembly
-    1. Primer trimming ([`Cutadapt`](https://cutadapt.readthedocs.io/en/stable/guide.html); *amplicon data only*)
-    2. Removal of host reads ([`Kraken 2`](http://ccb.jhu.edu/software/kraken2/))
-    3. Choice of multiple assembly tools ([`SPAdes`](http://cab.spbu.ru/software/spades/) *||* [`metaSPAdes`](http://cab.spbu.ru/software/meta-spades/) *||* [`Unicycler`](https://github.com/rrwick/Unicycler) *||* [`minia`](https://github.com/GATB/minia))
-        * Blast to reference genome ([`blastn`](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch))
-        * Contiguate assembly ([`ABACAS`](https://www.sanger.ac.uk/science/tools/pagit))
-        * Assembly report ([`PlasmidID`](https://github.com/BU-ISCIII/plasmidID))
-        * Assembly assessment report ([`QUAST`](http://quast.sourceforge.net/quast))
-        * Call variants relative to reference ([`Minimap2`](https://github.com/lh3/minimap2), [`seqwish`](https://github.com/ekg/seqwish), [`vg`](https://github.com/vgteam/vg), [`Bandage`](https://github.com/rrwick/Bandage))
-        * Variant annotation ([`SnpEff`](http://snpeff.sourceforge.net/SnpEff.html), [`SnpSift`](http://snpeff.sourceforge.net/SnpSift.html))
-7. Present QC and visualisation for raw read, alignment, assembly and variant calling results ([`MultiQC`](http://multiqc.info/))
-
-</details>
 
 Summary of resulting data: 
 
@@ -822,101 +817,101 @@ Summary of resulting data:
 ```ruby
 .
 ├── bam
-│   ├── SAMPLE_NAME.bam
-│   ├── SAMPLE_NAME.sorted.bam
-│   ├── SAMPLE_NAME.sorted.bam.bai
-│   ├── SAMPLE_NAME.trim.sorted.bam
-│   ├── SAMPLE_NAME.trim.sorted.bam.bai
+│   ├── <sample_name>.bam
+│   ├── <sample_name>.sorted.bam
+│   ├── <sample_name>.sorted.bam.bai
+│   ├── <sample_name>.trim.sorted.bam
+│   ├── <sample_name>.trim.sorted.bam.bai
 │   ├── log
-│   │   ├── SAMPLE_NAME.bowtie2.log
-│   │   ├── SAMPLE_NAME.trim.ivar.log
+│   │   ├── <sample_name>.bowtie2.log
+│   │   ├── <sample_name>.trim.ivar.log
 │   ├── mosdepth
 │   │   ├── amplicon
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.mosdepth.global.dist.txt
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.mosdepth.region.dist.txt
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.mosdepth.summary.txt
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.per-base.bed.gz
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.per-base.bed.gz.csi
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.regions.bed.gz
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.regions.bed.gz.csi
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.thresholds.bed.gz
-│   │   │   ├── SAMPLE_NAME.trim.amplicon.thresholds.bed.gz.csi
+│   │   │   ├── <sample_name>.trim.amplicon.mosdepth.global.dist.txt
+│   │   │   ├── <sample_name>.trim.amplicon.mosdepth.region.dist.txt
+│   │   │   ├── <sample_name>.trim.amplicon.mosdepth.summary.txt
+│   │   │   ├── <sample_name>.trim.amplicon.per-base.bed.gz
+│   │   │   ├── <sample_name>.trim.amplicon.per-base.bed.gz.csi
+│   │   │   ├── <sample_name>.trim.amplicon.regions.bed.gz
+│   │   │   ├── <sample_name>.trim.amplicon.regions.bed.gz.csi
+│   │   │   ├── <sample_name>.trim.amplicon.thresholds.bed.gz
+│   │   │   ├── <sample_name>.trim.amplicon.thresholds.bed.gz.csi
 │   │   │   └── plots
-│   │   │       ├── SAMPLE_NAME.trim.amplicon.regions.coverage.pdf
-│   │   │       ├── SAMPLE_NAME.trim.amplicon.regions.coverage.tsv
+│   │   │       ├── <sample_name>.trim.amplicon.regions.coverage.pdf
+│   │   │       ├── <sample_name>.trim.amplicon.regions.coverage.tsv
 │   │   │       ├── all_samples.trim.amplicon.regions.coverage.tsv
 │   │   │       └── all_samples.trim.amplicon.regions.heatmap.pdf
 │   │   └── genome
-│   │       ├── SAMPLE_NAME.trim.genome.mosdepth.global.dist.txt
-│   │       ├── SAMPLE_NAME.trim.genome.mosdepth.region.dist.txt
-│   │       ├── SAMPLE_NAME.trim.genome.mosdepth.summary.txt
-│   │       ├── SAMPLE_NAME.trim.genome.per-base.bed.gz
-│   │       ├── SAMPLE_NAME.trim.genome.per-base.bed.gz.csi
-│   │       ├── SAMPLE_NAME.trim.genome.regions.bed.gz
-│   │       ├── SAMPLE_NAME.trim.genome.regions.bed.gz.csi
+│   │       ├── <sample_name>.trim.genome.mosdepth.global.dist.txt
+│   │       ├── <sample_name>.trim.genome.mosdepth.region.dist.txt
+│   │       ├── <sample_name>.trim.genome.mosdepth.summary.txt
+│   │       ├── <sample_name>.trim.genome.per-base.bed.gz
+│   │       ├── <sample_name>.trim.genome.per-base.bed.gz.csi
+│   │       ├── <sample_name>.trim.genome.regions.bed.gz
+│   │       ├── <sample_name>.trim.genome.regions.bed.gz.csi
 │   │       └── plots
-│   │           ├── SAMPLE_NAME.trim.genome.regions.coverage.pdf
-│   │           ├── SAMPLE_NAME.trim.genome.regions.coverage.tsv
+│   │           ├── <sample_name>.trim.genome.regions.coverage.pdf
+│   │           ├── <sample_name>.trim.genome.regions.coverage.tsv
 │   │           └── all_samples.trim.genome.regions.coverage.tsv
 │   ├── mpileup
-│   │   ├── SAMPLE_NAME.trim.mpileup
+│   │   ├── <sample_name>.trim.mpileup
 │   ├── picard_metrics
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.alignment_summary_metrics
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.base_distribution_by_cycle_metrics
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.base_distribution_by_cycle.pdf
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.insert_size_histogram.pdf
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.insert_size_metrics
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.quality_by_cycle_metrics
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.quality_by_cycle.pdf
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.quality_distribution_metrics
-│   │   ├── SAMPLE_NAME.trim.CollectMultipleMetrics.quality_distribution.pdf
-│   │   ├── SAMPLE_NAME.trim.CollectWgsMetrics.coverage_metrics
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.alignment_summary_metrics
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.base_distribution_by_cycle_metrics
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.base_distribution_by_cycle.pdf
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.insert_size_histogram.pdf
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.insert_size_metrics
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_by_cycle_metrics
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_by_cycle.pdf
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_distribution_metrics
+│   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_distribution.pdf
+│   │   ├── <sample_name>.trim.CollectWgsMetrics.coverage_metrics
 │   └── samtools_stats
-│       ├── SAMPLE_NAME.sorted.bam.flagstat
-│       ├── SAMPLE_NAME.sorted.bam.idxstats
-│       ├── SAMPLE_NAME.sorted.bam.stats
-│       ├── SAMPLE_NAME.trim.sorted.bam.flagstat
-│       ├── SAMPLE_NAME.trim.sorted.bam.idxstats
-│       ├── SAMPLE_NAME.trim.sorted.bam.stats
+│       ├── <sample_name>.sorted.bam.flagstat
+│       ├── <sample_name>.sorted.bam.idxstats
+│       ├── <sample_name>.sorted.bam.stats
+│       ├── <sample_name>.trim.sorted.bam.flagstat
+│       ├── <sample_name>.trim.sorted.bam.idxstats
+│       ├── <sample_name>.trim.sorted.bam.stats
 ├── bcftools
-│   ├── SAMPLE_NAME.vcf.gz
-│   ├── SAMPLE_NAME.vcf.gz.tbi
+│   ├── <sample_name>.vcf.gz
+│   ├── <sample_name>.vcf.gz.tbi
 │   ├── bcftools_stats
-│   │   ├── SAMPLE_NAME.bcftools_stats.txt
+│   │   ├── <sample_name>.bcftools_stats.txt
 │   ├── consensus
-│   │   ├── SAMPLE_NAME.consensus.masked.fa
+│   │   ├── <sample_name>.consensus.masked.fa
 │   │   └── base_qc
-│   │       ├── SAMPLE_NAME.ACTG_density.pdf
-│   │       ├── SAMPLE_NAME.base_counts.pdf
-│   │       ├── SAMPLE_NAME.base_counts.tsv
-│   │       ├── SAMPLE_NAME.N_density.pdf
-│   │       ├── SAMPLE_NAME.N_run.tsv
+│   │       ├── <sample_name>.ACTG_density.pdf
+│   │       ├── <sample_name>.base_counts.pdf
+│   │       ├── <sample_name>.base_counts.tsv
+│   │       ├── <sample_name>.N_density.pdf
+│   │       ├── <sample_name>.N_run.tsv
 │   ├── quast
 │   │   ├── aligned_stats
 │   │   │   ├── cumulative_plot.pdf
 │   │   │   ├── NAx_plot.pdf
 │   │   │   └── NGAx_plot.pdf
 │   │   ├── basic_stats
-│   │   │   ├── SAMPLE_NAME.consensus.masked_GC_content_plot.pdf
+│   │   │   ├── <sample_name>.consensus.masked_GC_content_plot.pdf
 │   │   │   ├── cumulative_plot.pdf
 │   │   │   ├── GC_content_plot.pdf
 │   │   │   ├── gc.icarus.txt
 │   │   │   ├── NGx_plot.pdf
 │   │   │   └── Nx_plot.pdf
 │   │   ├── contigs_reports
-│   │   │   ├── SAMPLE_NAME_consensus_masked.mis_contigs.fa
-│   │   │   ├── all_alignments_SAMPLE_NAME-consensus-masked.tsv
-│   │   │   ├── contigs_report_SAMPLE_NAME-consensus-masked.mis_contigs.info
-│   │   │   ├── contigs_report_SAMPLE_NAME-consensus-masked.stderr
-│   │   │   ├── contigs_report_SAMPLE_NAME-consensus-masked.stdout
-│   │   │   ├── contigs_report_SAMPLE_NAME-consensus-masked.unaligned.info
+│   │   │   ├── <sample_name>_consensus_masked.mis_contigs.fa
+│   │   │   ├── all_alignments_<sample_name>-consensus-masked.tsv
+│   │   │   ├── contigs_report_<sample_name>-consensus-masked.mis_contigs.info
+│   │   │   ├── contigs_report_<sample_name>-consensus-masked.stderr
+│   │   │   ├── contigs_report_<sample_name>-consensus-masked.stdout
+│   │   │   ├── contigs_report_<sample_name>-consensus-masked.unaligned.info
 │   │   │   ├── minimap_output
-│   │   │   │   ├── SAMPLE_NAME-consensus-masked.coords
-│   │   │   │   ├── SAMPLE_NAME-consensus-masked.coords.filtered
-│   │   │   │   ├── SAMPLE_NAME-consensus-masked.coords_tmp
-│   │   │   │   ├── SAMPLE_NAME-consensus-masked.sf
-│   │   │   │   ├── SAMPLE_NAME-consensus-masked.unaligned
-│   │   │   │   ├── SAMPLE_NAME-consensus-masked.used_snps.gz
+│   │   │   │   ├── <sample_name>-consensus-masked.coords
+│   │   │   │   ├── <sample_name>-consensus-masked.coords.filtered
+│   │   │   │   ├── <sample_name>-consensus-masked.coords_tmp
+│   │   │   │   ├── <sample_name>-consensus-masked.sf
+│   │   │   │   ├── <sample_name>-consensus-masked.unaligned
+│   │   │   │   ├── <sample_name>-consensus-masked.used_snps.gz
 │   │   │   ├── misassemblies_frcurve_plot.pdf
 │   │   │   ├── misassemblies_plot.pdf
 │   │   │   ├── misassemblies_report.tex
@@ -929,8 +924,8 @@ Summary of resulting data:
 │   │   │   ├── unaligned_report.tsv
 │   │   │   └── unaligned_report.txt
 │   │   ├── genome_stats
-│   │   │   ├── SAMPLE_NAME-consensus-masked_gaps.txt
-│   │   │   ├── SAMPLE_NAME-consensus-masked_genomic_features_any.txt
+│   │   │   ├── <sample_name>-consensus-masked_gaps.txt
+│   │   │   ├── <sample_name>-consensus-masked_genomic_features_any.txt
 │   │   │   ├── complete_features_histogram.pdf
 │   │   │   ├── features_cumulative_plot.pdf
 │   │   │   ├── features_frcurve_plot.pdf
@@ -950,14 +945,14 @@ Summary of resulting data:
 │   │   ├── transposed_report.tsv
 │   │   └── transposed_report.txt
 │   └── snpeff
-│       ├── SAMPLE_NAME.snpEff.csv
-│       ├── SAMPLE_NAME.snpEff.genes.txt
-│       ├── SAMPLE_NAME.snpEff.summary.html
-│       ├── SAMPLE_NAME.snpEff.vcf.gz
-│       ├── SAMPLE_NAME.snpEff.vcf.gz.tbi
-│       ├── SAMPLE_NAME.snpSift.table.txt
+│       ├── <sample_name>.snpEff.csv
+│       ├── <sample_name>.snpEff.genes.txt
+│       ├── <sample_name>.snpEff.summary.html
+│       ├── <sample_name>.snpEff.vcf.gz
+│       ├── <sample_name>.snpEff.vcf.gz.tbi
+│       ├── <sample_name>.snpSift.table.txt
 ├── intersect
-│   ├── SAMPLE_NAME
+│   ├── <sample_name>
 │   │   ├── 0000.vcf.gz
 │   │   ├── 0000.vcf.gz.tbi
 │   │   ├── 0001.vcf.gz
@@ -967,28 +962,28 @@ Summary of resulting data:
 │   │   ├── README.txt
 │   │   └── sites.txt
 ├── ivar
-│   ├── SAMPLE_NAME.AF0.75.vcf.gz
-│   ├── SAMPLE_NAME.AF0.75.vcf.gz.tbi
-│   ├── SAMPLE_NAME.tsv
-│   ├── SAMPLE_NAME.vcf.gz
-│   ├── SAMPLE_NAME.vcf.gz.tbi
+│   ├── <sample_name>.AF0.75.vcf.gz
+│   ├── <sample_name>.AF0.75.vcf.gz.tbi
+│   ├── <sample_name>.tsv
+│   ├── <sample_name>.vcf.gz
+│   ├── <sample_name>.vcf.gz.tbi
 │   ├── bcftools_stats
-│   │   ├── SAMPLE_NAME.AF0.75.bcftools_stats.txt
-│   │   ├── SAMPLE_NAME.bcftools_stats.txt
+│   │   ├── <sample_name>.AF0.75.bcftools_stats.txt
+│   │   ├── <sample_name>.bcftools_stats.txt
 │   ├── consensus
-│   │   ├── SAMPLE_NAME.AF0.75.consensus.fa
-│   │   ├── SAMPLE_NAME.AF0.75.consensus.qual.txt
+│   │   ├── <sample_name>.AF0.75.consensus.fa
+│   │   ├── <sample_name>.AF0.75.consensus.qual.txt
 │   │   └── base_qc
-│   │       ├── SAMPLE_NAME.AF0.75.ACTG_density.pdf
-│   │       ├── SAMPLE_NAME.AF0.75.base_counts.pdf
-│   │       ├── SAMPLE_NAME.AF0.75.base_counts.tsv
-│   │       ├── SAMPLE_NAME.AF0.75.N_density.pdf
-│   │       ├── SAMPLE_NAME.AF0.75.N_run.tsv
-│   │       ├── SAMPLE_NAME.AF0.75.R_density.pdf
-│   │       ├── SAMPLE_NAME.AF0.75.Y_density.pdf
+│   │       ├── <sample_name>.AF0.75.ACTG_density.pdf
+│   │       ├── <sample_name>.AF0.75.base_counts.pdf
+│   │       ├── <sample_name>.AF0.75.base_counts.tsv
+│   │       ├── <sample_name>.AF0.75.N_density.pdf
+│   │       ├── <sample_name>.AF0.75.N_run.tsv
+│   │       ├── <sample_name>.AF0.75.R_density.pdf
+│   │       ├── <sample_name>.AF0.75.Y_density.pdf
 │   ├── log
-│   │   ├── SAMPLE_NAME.AF0.75.variant.counts.log
-│   │   ├── SAMPLE_NAME.variant.counts.log
+│   │   ├── <sample_name>.AF0.75.variant.counts.log
+│   │   ├── <sample_name>.variant.counts.log
 │   ├── quast
 │   │   └── AF0.75
 │   │       ├── aligned_stats
@@ -996,26 +991,26 @@ Summary of resulting data:
 │   │       │   ├── NAx_plot.pdf
 │   │       │   └── NGAx_plot.pdf
 │   │       ├── basic_stats
-│   │       │   ├── SAMPLE_NAME.AF0.75.consensus_GC_content_plot.pdf
+│   │       │   ├── <sample_name>.AF0.75.consensus_GC_content_plot.pdf
 │   │       │   ├── cumulative_plot.pdf
 │   │       │   ├── GC_content_plot.pdf
 │   │       │   ├── gc.icarus.txt
 │   │       │   ├── NGx_plot.pdf
 │   │       │   └── Nx_plot.pdf
 │   │       ├── contigs_reports
-│   │       │   ├── SAMPLE_NAME_AF0_75_consensus.mis_contigs.fa
-│   │       │   ├── all_alignments_SAMPLE_NAME-AF0-75-consensus.tsv
-│   │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus.mis_contigs.info
-│   │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus.stderr
-│   │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus.stdout
-│   │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus.unaligned.info
+│   │       │   ├── <sample_name>_AF0_75_consensus.mis_contigs.fa
+│   │       │   ├── all_alignments_<sample_name>-AF0-75-consensus.tsv
+│   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.mis_contigs.info
+│   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.stderr
+│   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.stdout
+│   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.unaligned.info
 │   │       │   ├── minimap_output
-│   │       │   │   ├── SAMPLE_NAME-AF0-75-consensus.coords
-│   │       │   │   ├── SAMPLE_NAME-AF0-75-consensus.coords.filtered
-│   │       │   │   ├── SAMPLE_NAME-AF0-75-consensus.coords_tmp
-│   │       │   │   ├── SAMPLE_NAME-AF0-75-consensus.sf
-│   │       │   │   ├── SAMPLE_NAME-AF0-75-consensus.unaligned
-│   │       │   │   ├── SAMPLE_NAME-AF0-75-consensus.used_snps.gz
+│   │       │   │   ├── <sample_name>-AF0-75-consensus.coords
+│   │       │   │   ├── <sample_name>-AF0-75-consensus.coords.filtered
+│   │       │   │   ├── <sample_name>-AF0-75-consensus.coords_tmp
+│   │       │   │   ├── <sample_name>-AF0-75-consensus.sf
+│   │       │   │   ├── <sample_name>-AF0-75-consensus.unaligned
+│   │       │   │   ├── <sample_name>-AF0-75-consensus.used_snps.gz
 │   │       │   ├── misassemblies_frcurve_plot.pdf
 │   │       │   ├── misassemblies_plot.pdf
 │   │       │   ├── misassemblies_report.tex
@@ -1028,8 +1023,8 @@ Summary of resulting data:
 │   │       │   ├── unaligned_report.tsv
 │   │       │   └── unaligned_report.txt
 │   │       ├── genome_stats
-│   │       │   ├── SAMPLE_NAME-AF0-75-consensus_gaps.txt
-│   │       │   ├── SAMPLE_NAME-AF0-75-consensus_genomic_features_any.txt
+│   │       │   ├── <sample_name>-AF0-75-consensus_gaps.txt
+│   │       │   ├── <sample_name>-AF0-75-consensus_genomic_features_any.txt
 │   │       │   ├── complete_features_histogram.pdf
 │   │       │   ├── features_cumulative_plot.pdf
 │   │       │   ├── features_frcurve_plot.pdf
@@ -1049,41 +1044,41 @@ Summary of resulting data:
 │   │       ├── transposed_report.tsv
 │   │       └── transposed_report.txt
 │   └── snpeff
-│       ├── SAMPLE_NAME.AF0.75.snpEff.csv
-│       ├── SAMPLE_NAME.AF0.75.snpEff.genes.txt
-│       ├── SAMPLE_NAME.AF0.75.snpEff.summary.html
-│       ├── SAMPLE_NAME.AF0.75.snpEff.vcf.gz
-│       ├── SAMPLE_NAME.AF0.75.snpEff.vcf.gz.tbi
-│       ├── SAMPLE_NAME.AF0.75.snpSift.table.txt
-│       ├── SAMPLE_NAME.snpEff.csv
-│       ├── SAMPLE_NAME.snpEff.genes.txt
-│       ├── SAMPLE_NAME.snpEff.summary.html
-│       ├── SAMPLE_NAME.snpEff.vcf.gz
-│       ├── SAMPLE_NAME.snpEff.vcf.gz.tbi
-│       ├── SAMPLE_NAME.snpSift.table.txt
+│       ├── <sample_name>.AF0.75.snpEff.csv
+│       ├── <sample_name>.AF0.75.snpEff.genes.txt
+│       ├── <sample_name>.AF0.75.snpEff.summary.html
+│       ├── <sample_name>.AF0.75.snpEff.vcf.gz
+│       ├── <sample_name>.AF0.75.snpEff.vcf.gz.tbi
+│       ├── <sample_name>.AF0.75.snpSift.table.txt
+│       ├── <sample_name>.snpEff.csv
+│       ├── <sample_name>.snpEff.genes.txt
+│       ├── <sample_name>.snpEff.summary.html
+│       ├── <sample_name>.snpEff.vcf.gz
+│       ├── <sample_name>.snpEff.vcf.gz.tbi
+│       ├── <sample_name>.snpSift.table.txt
 │       ├── snpSift_template2.txt
 │       ├── snpSift_template_filtered.txt
 │       └── snpSift_template.txt
 ├── summary_variants_metrics_mqc.tsv
 └── varscan2
-    ├── SAMPLE_NAME.AF0.75.vcf.gz
-    ├── SAMPLE_NAME.AF0.75.vcf.gz.tbi
-    ├── SAMPLE_NAME.vcf.gz
-    ├── SAMPLE_NAME.vcf.gz.tbi
+    ├── <sample_name>.AF0.75.vcf.gz
+    ├── <sample_name>.AF0.75.vcf.gz.tbi
+    ├── <sample_name>.vcf.gz
+    ├── <sample_name>.vcf.gz.tbi
     ├── bcftools_stats
-    │   ├── SAMPLE_NAME.AF0.75.bcftools_stats.txt
-    │   ├── SAMPLE_NAME.bcftools_stats.txt
+    │   ├── <sample_name>.AF0.75.bcftools_stats.txt
+    │   ├── <sample_name>.bcftools_stats.txt
     ├── consensus
-    │   ├── SAMPLE_NAME.AF0.75.consensus.masked.fa
+    │   ├── <sample_name>.AF0.75.consensus.masked.fa
     │   ├── base_qc
-    │   │   ├── SAMPLE_NAME.AF0.75.ACTG_density.pdf
-    │   │   ├── SAMPLE_NAME.AF0.75.base_counts.pdf
-    │   │   ├── SAMPLE_NAME.AF0.75.base_counts.tsv
-    │   │   ├── SAMPLE_NAME.AF0.75.N_density.pdf
-    │   │   ├── SAMPLE_NAME.AF0.75.N_run.tsv
+    │   │   ├── <sample_name>.AF0.75.ACTG_density.pdf
+    │   │   ├── <sample_name>.AF0.75.base_counts.pdf
+    │   │   ├── <sample_name>.AF0.75.base_counts.tsv
+    │   │   ├── <sample_name>.AF0.75.N_density.pdf
+    │   │   ├── <sample_name>.AF0.75.N_run.tsv
     │   └── snpSift_template.txt
     ├── log
-    │   ├── SAMPLE_NAME.varscan2.log
+    │   ├── <sample_name>.varscan2.log
     ├── quast
     │   └── AF0.75
     │       ├── aligned_stats
@@ -1091,26 +1086,26 @@ Summary of resulting data:
     │       │   ├── NAx_plot.pdf
     │       │   └── NGAx_plot.pdf
     │       ├── basic_stats
-    │       │   ├── SAMPLE_NAME.AF0.75.consensus.masked_GC_content_plot.pdf
+    │       │   ├── <sample_name>.AF0.75.consensus.masked_GC_content_plot.pdf
     │       │   ├── cumulative_plot.pdf
     │       │   ├── GC_content_plot.pdf
     │       │   ├── gc.icarus.txt
     │       │   ├── NGx_plot.pdf
     │       │   └── Nx_plot.pdf
     │       ├── contigs_reports
-    │       │   ├── SAMPLE_NAME_AF0_75_consensus_masked.mis_contigs.fa
-    │       │   ├── all_alignments_SAMPLE_NAME-AF0-75-consensus-masked.tsv
-    │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus-masked.mis_contigs.info
-    │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus-masked.stderr
-    │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus-masked.stdout
-    │       │   ├── contigs_report_SAMPLE_NAME-AF0-75-consensus-masked.unaligned.info
+    │       │   ├── <sample_name>_AF0_75_consensus_masked.mis_contigs.fa
+    │       │   ├── all_alignments_<sample_name>-AF0-75-consensus-masked.tsv
+    │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.mis_contigs.info
+    │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.stderr
+    │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.stdout
+    │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.unaligned.info
     │       │   ├── minimap_output
-    │       │   │   ├── SAMPLE_NAME-AF0-75-consensus-masked.coords
-    │       │   │   ├── SAMPLE_NAME-AF0-75-consensus-masked.coords.filtered
-    │       │   │   ├── SAMPLE_NAME-AF0-75-consensus-masked.coords_tmp
-    │       │   │   ├── SAMPLE_NAME-AF0-75-consensus-masked.sf
-    │       │   │   ├── SAMPLE_NAME-AF0-75-consensus-masked.unaligned
-    │       │   │   ├── SAMPLE_NAME-AF0-75-consensus-masked.used_snps.gz
+    │       │   │   ├── <sample_name>-AF0-75-consensus-masked.coords
+    │       │   │   ├── <sample_name>-AF0-75-consensus-masked.coords.filtered
+    │       │   │   ├── <sample_name>-AF0-75-consensus-masked.coords_tmp
+    │       │   │   ├── <sample_name>-AF0-75-consensus-masked.sf
+    │       │   │   ├── <sample_name>-AF0-75-consensus-masked.unaligned
+    │       │   │   ├── <sample_name>-AF0-75-consensus-masked.used_snps.gz
     │       │   ├── misassemblies_frcurve_plot.pdf
     │       │   ├── misassemblies_plot.pdf
     │       │   ├── misassemblies_report.tex
@@ -1123,8 +1118,8 @@ Summary of resulting data:
     │       │   ├── unaligned_report.tsv
     │       │   └── unaligned_report.txt
     │       ├── genome_stats
-    │       │   ├── SAMPLE_NAME-AF0-75-consensus-masked_gaps.txt
-    │       │   ├── SAMPLE_NAME-AF0-75-consensus-masked_genomic_features_any.txt
+    │       │   ├── <sample_name>-AF0-75-consensus-masked_gaps.txt
+    │       │   ├── <sample_name>-AF0-75-consensus-masked_genomic_features_any.txt
     │       │   ├── complete_features_histogram.pdf
     │       │   ├── features_cumulative_plot.pdf
     │       │   ├── features_frcurve_plot.pdf
@@ -1144,12 +1139,12 @@ Summary of resulting data:
     │       ├── transposed_report.tsv
     │       └── transposed_report.txt
     └── snpeff
-        ├── SAMPLE_NAME.AF0.75.snpEff.csv
-        ├── SAMPLE_NAME.AF0.75.snpEff.genes.txt
-        ├── SAMPLE_NAME.AF0.75.snpEff.summary.html
-        ├── SAMPLE_NAME.AF0.75.snpEff.vcf.gz
-        ├── SAMPLE_NAME.AF0.75.snpEff.vcf.gz.tbi
-        ├── SAMPLE_NAME.AF0.75.snpSift.table.txt
+        ├── <sample_name>.AF0.75.snpEff.csv
+        ├── <sample_name>.AF0.75.snpEff.genes.txt
+        ├── <sample_name>.AF0.75.snpEff.summary.html
+        ├── <sample_name>.AF0.75.snpEff.vcf.gz
+        ├── <sample_name>.AF0.75.snpEff.vcf.gz.tbi
+        ├── <sample_name>.AF0.75.snpSift.table.txt
 ```
 </details>
 
@@ -1194,7 +1189,8 @@ Lineage
 | `%Ns_10x` | percentajeNs.py |
 | `Lineage` | Pangolin |
 
-
+<details>
+    <summary>Click if you want to see a Quick Start guide to nextflow</summary>
 ## Quick Start
 
 1. Install [`nextflow`](https://nf-co.re/usage/installation)
@@ -1211,6 +1207,8 @@ Lineage
 
 See the [usage documentation](docs/usage.md) for all of the available options when running the pipeline.
 
+</details>    
+    
 ## Documentation
 
 The nf-core/viralrecon pipeline comes with documentation about the pipeline, found in the `docs/` directory:
