@@ -741,7 +741,77 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
     
 </details>
     
-    
+**Launching Pangolin analysis** 
+	
+```bash
+pangolin
+conda activate pangolin
+pangolin --update
+```	
+
+```bash
+Pangolin
+└── lablog
+```
+
+-lablog
+	
+This file contains the commands necessary to run pangoling and perform the lineage report.
+
+1) The first command makes a multifasta file .fasta with all the variant consensus of the samples include in the analysis. 
+
+2) It saves the pangoling version in order to make reproducible the lineage analysis and comparable with older services.
+	
+3) It has the commands necessary to make the lineage_report.csv table, that contains the information about the lineage for every sample.
+	
+We also take adventage of the nohup comand and redirect the output to a .log file. We perform ```bash lablog```  to create a bash script in order to run pangolin using the multifasta file as input. Then we do ```nohup bash _01_pangolin.sh &> $(date '+%Y%m%d')_pangolin01.log &``` and after that the directory will look like this: 
+
+	
+```bash
+├── _01_pangolin.sh
+├── (date '+%Y%m%d')_pangolin
+├── (date '+%Y%m%d')_pangolin01.log
+├── human_masked.fasta
+├── lablog
+├── lineage_report.csv
+├── pangolin
+│   ├── CODE_OF_CONDUCT.md
+│   ├── Dockerfile
+│   ├── docs
+│   │   ├── logo.png
+│   │   └── update_guide_tree.md
+│   ├── environment.yml
+│   ├── LICENSE.txt
+│   ├── pangolin
+│   │   ├── command.py
+│   │   ├── data
+│   │   │   └── reference.fasta
+│   │   ├── __init__.py
+│   │   ├── scripts
+│   │   │   ├── __init__.py
+│   │   │   ├── pangolearn.py
+│   │   │   └── pangolearn.smk
+│   │   ├── test
+│   │   │   ├── lineage_finder_test.py
+│   │   │   └── test_seqs.fasta
+│   │   └── utils
+│   │       ├── custom_logger.py
+│   │       ├── data_install_checks.py
+│   │       ├── dependency_checks.py
+│   │       ├── hash_functions.py
+│   │       ├── __init__.py
+│   │       ├── log_colours.py
+│   │       └── log_handler_handle.py
+│   ├── README.md
+│   ├── setup.py
+│   └── TESTING.md
+└── version.log
+
+```
+
+- lablog 
+This lablog contains 
+	
 **$(date '+%Y%m%d')_ANALYSIS02_MET**
 
 **Lablog**
