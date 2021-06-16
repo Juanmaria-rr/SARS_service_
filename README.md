@@ -800,7 +800,7 @@ Regarding the Analysis of variants (folder Analysis_01), samples are processed a
 Summary of resulting data: 
 
 <details>
-  <summary>Click to expand!</summary>
+  <summary>Click here to see the Summary of the resulting data structure from Assembly folder</summary>
 
 ```ruby
 .
