@@ -1179,24 +1179,21 @@ Lineage
 
 To perform this statistics_table, we use a bash script that takes all the data from their respective directory and files. 
 
-    <details>
-        <summary> Show the complete script that makes the statistics_table</summary>
-        ```bash
-        echo -e "Host\tVirusSequence\tSample\tTotal reads\tReads_host R1\tReads_host_total\t%_reads_host\tReads_virus_total\t%_reads_virus\tUnmapped_reads\t%Unmapped_reads\tMean DP Coverage\tPCT_10X\tVariants_consensusx10\tMissense_variants\t%Ns10x\tLineage" >> file_st.tab
+<details>
+	<summary> Show the complete script that makes the statistics_table </summary>
+
+```bash
+	
+	echo -e "Host\tVirusSequence\tSample\tTotal reads\tReads_host R1\tReads_host_total\t%_reads_host\tReads_virus_total\t%_reads_virus\tUnmapped_reads\t%Unmapped_reads\tMean DP Coverage\tPCT_10X\tVariants_consensusx10\tMissense_variants\t%Ns10x\tLineage" >> file_st.tab
 
 cat samples_id.txt | while read in
 
-          do 
+	  do 
 	 echo -e "Human\tNC_045512.2\t${in}\t$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 in total' | tr ' ' '\t' | cut -f1)\t$(cat 20210603_viralrecon_mapping/assembly/kraken2/${in}.kraken2.report.txt | tail -n1 | cut -f3)\t$(cat 20210603_viralrecon_mapping/assembly/kraken2/${in}.kraken2.report.txt | tail -n1 | cut -f3| awk '{print ($1*2)}')\t$(cat 20210603_viralrecon_mapping/assembly/kraken2/${in}.kraken2.report.txt | tail -n1 | cut -f1)\t$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 mapped' | tr ' ' '\t' | cut -f1)\t$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 mapped' | tr '(' '\t' | cut -f2 | tr '%' '\t' | cut -f1)\t$(echo "$(echo -e "$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 in total' | tr ' ' '\t' | cut -f1)\t$(cat 20210603_viralrecon_mapping/assembly/kraken2/${in}.kraken2.report.txt | tail -n1 | cut -f3| awk '{print $1*2}')\t$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 mapped' | tr ' ' '\t' | cut -f1)" | awk '{print $1-($2+$3)}')")\t$(echo "$(echo -e "$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 in total' | tr ' ' '\t' | cut -f1)\t$(cat 20210603_viralrecon_mapping/assembly/kraken2/${in}.kraken2.report.txt | tail -n1 | cut -f3| awk '{print $1*2}')\t$(cat 20210603_viralrecon_mapping/variants/bam/samtools_stats/${in}.sorted.bam.flagstat | grep '+ 0 mapped' | tr ' ' '\t' | cut -f1)" | awk '{print (($1-($2+$3))/$1)*100}')")\t$(head -n8 20210603_viralrecon_mapping/variants/bam/picard_metrics/${in}.trim.CollectWgsMetrics.coverage_metrics | tail -n1 | cut -f2)\t$(head -n8 20210603_viralrecon_mapping/variants/bam/picard_metrics/${in}.trim.CollectWgsMetrics.coverage_metrics | tail -n1 | cut -f16)\t$(zcat 20210603_viralrecon_mapping/variants/varscan2/${in}.AF0.75.vcf.gz | grep -v '^#' | wc -l)\t$(grep 'missense_variant' 20210603_viralrecon_mapping/variants/varscan2/snpeff/${in}.AF0.75.snpSift.table.txt | wc -l)\t$(cat %Ns.tab | grep ${in} | cut -f2)\t$(cat pangolin/lineage_report.csv | grep ${in} | cut -d',' -f2)"  >> file_st.tab
 	done
-	```
-    </details>
-    
-    
-    
-    
-    
-    
+```
+
+</details>
     
 <details>
     <summary>Click if you want to see a Quick Start guide to Nextflow</summary>
