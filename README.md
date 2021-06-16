@@ -94,6 +94,10 @@ ANALYSIS/00-reads/
 
 To note: this lablog has to be copied from the previous service performed. This lablog is the essential file which all the analysis and directories organization will be contructed from. IThis lablog perform the next tasks: 
 
+
+date_ANALYSIS01_AMPLICONS_HUMAN.  
+
+
 1) It makes symbolic links with 00-reads folder and samples_id.txt file, which contain the raw data (Fastqc format) and sample names. Moreover, it creates the samplesheet.csv needed for the analyses. 
 
 ```ruby
@@ -117,22 +121,6 @@ date_ANALYSIS01_AMPLICONS_HUMAN/
 
 ```ruby
 echo "nextflow run /processing_Data/bioinformatics/pipelines/viralrecon_prod/main.nf -bg --input samplesheet.csv -profile conda --outdir $(date '+%Y%m%d')_viralrecon_mapping --assemblers none --amplicon_fasta 'https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/genome/NC_045512.2/amplicon/nCoV-2019.artic.V3.primer.fasta' --amplicon_bed 'https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/genome/NC_045512.2/amplicon/nCoV-2019.artic.V3.bed' --kraken2_db /processing_Data/bioinformatics/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz --protocol amplicon --genome NC_045512.2 --save_align_intermeds --skip_vg --skip_markduplicates --save_mpileup --min_allele_freq 0 -resume" > _01_viralrecon_mapping.sh
-```
-
-
-3) Moreover, a bash script to create a summary_report and a python script to analyse the percentages of N in every analysed samples are copied in this folder using two commands in the lablog:
-
-```ruby
-cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/create_summary_report.sh .
-cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/percentajeNs.py .
-```
-`
-
-4) Finally, the directories of $(date '+%Y%m%d')_Pangolin analyses and $(date '+%Y%m%d')variants_table are created. This folderds will include the following results from Pangoling lineages classification and the results of SARS-CoV2 variants. 
-
-```ruby
-mkdir -p $(date '+%Y%m%d')_pangolin
-mkdir -p $(date '+%Y%m%d')_variants_table
 ```
 
 3) Moreover, a bash script to create a summary_report and a python script to analyse the percentages of N in every analysed samples are copied in this folder using two commands in the lablog:
@@ -192,7 +180,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/
 └── work
 ``` 
 
-Now, all the data coming from the viralrecon analysis wil be stored in /20210603_viralrecon_mapping folder, which will take the following structure if the analysis is performed correctly (only directories shown).
+Now, all the data coming from the viralrecon analysis is located in /20210603_viralrecon_mapping folder, which will take the following structure if the analysis is performed correctly (only directories shown).
 
 ```ruby
 date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
@@ -212,18 +200,6 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
     ├── ivar
     └── varscan2
 ```
-
-
-2. Analysis_02_Met. 
-
-
-
-date_ANALYSIS01_AMPLICONS_HUMAN. 
-
-    Lablog -> 1) Make symbolic links eith 00-reads folder and samples_id.txt file. 2º) In addition, it contains the command necessary to perform the samplesheet.csv file;3º) the main nextflow command to run the variant analysis of SARS using viralrecon and kraken2 (wich will be located in the _01_viral_recon_mapping.sh bash file. 4º) Copy the bash script "create_summary_report.sh" and the python script percentajeNs.py from the "proccessin_Data/Bioinformatics/services_and_colaborations" folder. *) There is a commented command in this lablog for the assembly, but we dont run it. 
-    
-    variants_table 
-        Lablog -> It makes symbolic links to vcf.gz from variants/varsca2/SAMPLE_NAME.AF0.75.vcf.gz; merge all VCF files using bcftools and extract data using POS/REF/ALT from VCF files, in order to make a table for variants analysis. 
     date_viralrecon_mapping
 
 ** Only directories.
@@ -307,7 +283,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN.
         │       └── icarus_viewers
         └── snpeff
         
-**Directories + sample_name
+**Directories + sample_name files
 ```ruby
 
 ├── assembly
@@ -727,21 +703,67 @@ date_ANALYSIS01_AMPLICONS_HUMAN.
             ├── 214704.snpSift.table.txt
 ```
 
-
 ----------------------
 
-├── ANALYSIS
-
-├── DOC
-├── RAW
-│   └── MiSeq_GEN_216_10_samples
-├── REFERENCES
-├── RESULTS
-└── TMP
 
 date_ANALYSIS02_MET.    
+└──  lablog
 
-    Lablog. Includes the commands to construct symbolic links with 00-reads and samples_id.txt files from the main "Analysis" directory. It also has the nextflow run command neccesary to perform the metagenomic analysis using the main.nf file using the mag repository data taken from "/processing_Data/bioinformatics/pipelines/mag/main.nf", to make date_mag folder and performed the metagnomic classification using Kraken from "/processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz" included in the _01_mag.sh. In this _01_mag.sh, the output will be redirected to a .log in order to follow the run. 
+
+**Lablog
+
+Includes the commands to construct symbolic links with 00-reads and samples_id.txt files from the main "Analysis" directory. It also has the nextflow run command neccesary to perform the metagenomic analysis using the main.nf file using the mag repository data taken from "/processing_Data/bioinformatics/pipelines/mag/main.nf", to make date_mag folder and performed the metagnomic classification using Kraken from "/processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz" included in the _01_mag.sh. As in viralrecon analysis, the output of _01_mag.sh will be redirected to a .log in order to follow the run. The content of the lablog is shown in the following lines: 
+
+```ruby
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+echo "nextflow run /processing_Data/bioinformatics/pipelines/mag/main.nf -bg --reads '00-reads/*_R{1,2}.fastq.gz' -profile hpc_isciii --outdir $(date '+%Y%m%d')_mag --kraken2_db /processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz --skip_busco --skip_spades --skip_spadeshybrid --skip_megahit -resume" > _01_mag.sh
+```
+
+After this, the directory should be like this: 
+
+```ruby
+.
+├── 00-reads -> ../00-reads
+├── _01_mag.sh
+├── lablog
+└── samples_id.txt -> ../samples_id.txt
+```
+
+***Launching metagenomic analysis analyses
+
+As seen for viralrecon analyses, we run this pipeline using nextflow and the nohup command: 
+
+```ruby
+#nohup bash _01_mag.sh &> $(date '+%Y%m%d')_mag01.log &
+```
+Similarly to what viralrecon, the directory is modified with new folders that store the data and results derived from the analysis: 
+
+```ruby
+.
+├── 00-reads -> ../00-reads
+├── _01_mag.sh
+├── _02_mag.sh
+├── 20210603_mag
+├── 20210607_mag01.log
+├── lablog
+├── samples_id.txt -> ../samples_id.txt
+└── work
+```
+Now, /$(date '+%Y%m%d')_mag folder include the next directories regarding metagnomic analyses: 
+
+```ruby
+.
+├── pipeline_info
+├── QC_shortreads
+│   ├── fastp
+│   │   ├── <sample_name>
+│   ├── fastqc
+│   └── remove_phix
+└── Taxonomy
+    └── kraken2
+        ├── <sample_name>
+```
 
 
 ## Pipeline summary
@@ -776,6 +798,11 @@ Regarding the Analysis of variants (folder Analysis_01), samples are processed a
 7. Present QC and visualisation for raw read, alignment, assembly and variant calling results ([`MultiQC`](http://multiqc.info/))
 
 Summary of resulting data: 
+
+<details>
+  <summary>Click to expand!</summary>
+
+```ruby
 .
 ├── bam
 │   ├── SAMPLE_NAME.bam
@@ -1106,10 +1133,13 @@ Summary of resulting data:
         ├── SAMPLE_NAME.AF0.75.snpEff.vcf.gz
         ├── SAMPLE_NAME.AF0.75.snpEff.vcf.gz.tbi
         ├── SAMPLE_NAME.AF0.75.snpSift.table.txt
+```
+</details>
 
 ## Results and statistics. 
 
-From the files generated after the variant obtention, the next data are extracted and mounted in a tab separated file that will be used to analysed the statistics from every sample sequenced. 
+From the files generated after the two analyses (viralrecon and metagenomics), the next aim is to extract and mount in a tab separated file different data from both analyses that will give an overview of the metrics and summary results. 
+
 
 Host (Human/bison)
 VirusSequence (reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2
