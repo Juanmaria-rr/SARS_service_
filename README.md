@@ -15,31 +15,32 @@
 
 In order to make reproducible the analysis run by BU_ISCIII, here we describe step by step how SARS_service is performed in BU_ISCIII using the combination of viralrecon pipeline with Pangolin and Kraken, taking adventage of the Nextflow workflow framework. 
 
-## Viene de DSL2??# 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with Docker containers making installation trivial and results highly reproducible. Furthermore, automated continuous integration tests that run the pipeline on a full-sized dataset using AWS cloud ensure that the code is stable.
 
-## Local data organization summary
+# Local data organization summary
 
-Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-Cov) and the name of the researcher, typically "SRVxxxx_date_SARS_name-researcher". 
+Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-Cov) and the name of the researcher, typically "SRVxxxx_date_SARS_>researcher_name>". 
+
 In this folder there will be other directories: 
 
 ```ruby
+SRVxxxx_date_SARS_>researcher_name>
 ├── ANALYSIS
 │   ├── 00-reads
 │   ├── $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
 │   └── $(date '+%Y%m%d')_ANALYSIS02_MET
 ├── DOC
 ├── RAW
-│   └── <samples_folder>
+│   └── <sample_name>_folder>
 ├── REFERENCES
 ├── RESULTS
 └── TMP
 
 ```
 
-In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN  there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty. 
+In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty (¿?).
 
-# ANALYSIS
+# /ANALYSIS
 
 ```ruby
 ANALYSIS
@@ -49,7 +50,7 @@ ANALYSIS
 ├── lablog
 └── samples_id.txt
 ```
-- lablog 
+**lablog** 
 
 It contains the commands necesary to make the sample_id.txt file, which is derived from all the samples located in the RAW folder. It also has the commands to create the other two folders in which the analysis will be splited:
 
@@ -59,11 +60,11 @@ mkdir -p 00-reads
 mkdir -p $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
 mkdir -p $(date '+%Y%m%d')_ANALYSIS02_MET
 ```
-- samples_id.txt - 
+**samples_id.txt**
 
 Is a list with the <sample_name> derived from the samples files .fastq.gz stored in the folder RAW.
 
-**00-reads. 
+**00-reads**
 
 ```ruby
 ANALYSIS/00-reads/
@@ -84,13 +85,13 @@ ANALYSIS/00-reads/
 └── lablog
 ```
 
-**/$(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
+**/$(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN**
 
 ```ruby
 20210531_ANALYSIS01_AMPLICONS_HUMAN/
 └── lablog
 ```
-- Lablog
+**lablog**
 
 To note: this lablog has to be copied from the previous service performed. This lablog is the essential file which all the analysis and directories organization will be contructed from. IThis lablog perform the next tasks: 
 
@@ -146,7 +147,7 @@ $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN/
 ├── variants_table
 └── work
 ``` 
-**Launching Viralrecon analysis
+**Launching Viralrecon analysis**
 
 Once this, we are ready to run viralrecon analysis, which will be launched using nohup command in order to allow the computer to run other tasks independetly of our ssh conection: 
 
@@ -159,7 +160,7 @@ As you can see in the code above, the output from the viralrecon pipeline is dir
 
 <details>
     <summary> Click if you want to see a brief summary to the generic pipeline of viralrecon </summary>
-## Pipeline summary
+# Pipeline summary
 
 Regarding the Analysis of variants (folder Analysis_01), samples are processed and analysed using viralrecon pipeline, which is run as follows: 
 
