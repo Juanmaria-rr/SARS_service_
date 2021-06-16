@@ -285,8 +285,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
         │       ├── genome_stats
         │       └── icarus_viewers
         └── snpeff
-
-</summary>
+</details>
 
     
 **Directories + sample_name files
