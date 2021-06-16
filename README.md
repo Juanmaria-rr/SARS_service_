@@ -41,16 +41,15 @@ In ANALYSIS folder is where all the analysis process will run. In RAW, inside a 
 
 **ANALYSIS_folder**
 
-**/00-reads. 
-
-Here there is a Lablog file which contains the commands that will make symbolic links to every RAW/RUN_xxx/R1/2.fastq.gz files to be analysed.
-
 ```ruby
-cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R1*.fastq.gz %_R1.fastq.gz" | bash
-cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R2*.fastq.gz %_R2.fastq.gz" | bash
+ANALYSIS
+├── 00-reads
+├── 20210531_ANALYSIS01_AMPLICONS_HUMAN
+├── 20210531_ANALYSIS02_MET
+├── lablog
+└── samples_id.txt
 ```
-
-*Lablog
+Lablog - 
 
 It contains the commands necesary to make the sample_id.txt file, which is derived from all the samples located in the RAW folder. It also has the commands to create the other two folders in which the analysis will be splited:
 
@@ -60,12 +59,42 @@ mkdir -p 00-reads
 mkdir -p $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
 mkdir -p $(date '+%Y%m%d')_ANALYSIS02_MET
 ```
+samples_id.txt - 
+
+Is a list with the <sample_name> derived from the samples files .fastq.gz stored in the folder RAW.
+
+**/00-reads. 
+
+```ruby
+ANALYSIS/00-reads/
+└── lablog
+```
+Its Lablog file contains the commands that will make symbolic links to every RAW/<RUN_name>/R1/2.fastq.gz files to be analysed.
+
+```ruby
+cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R1*.fastq.gz %_R1.fastq.gz" | bash
+cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R2*.fastq.gz %_R2.fastq.gz" | bash
+```
+Once these symbolic links are constructed, the folder schema will look like this: 
+
+```ruby
+ANALYSIS/00-reads/
+├── <sample_name>_R1.fastq.gz -> ../../RAW/<RUN_name>_samples/<sample_name>_R1_001.fastq.gz
+├── <sample_name>_R2.fastq.gz -> ../../RAW/<RUN_name>_samples/<sample_name>_001.fastq.gz
+└── lablog
+```
 
 /date_ANALYSIS01_AMPLICONS_HUMAN
 
+```ruby
+20210531_ANALYSIS01_AMPLICONS_HUMAN/
+└── lablog
+```
 **Lablog
 
-Where the lablog of the previous services has to be located. This lablog makes symbolic links with 00-reads folder and samples_id.txt file, which contain the raw data (Fastqc format) and sample names. Moreover, it creates the samplesheet.csv needed for the analyses. 
+To note: this lablog has to be copied from the previous service performed. This lablog is the essential file which all the analysis and directories organization will be contructed from. IThis lablog perform the next tasks: 
+
+1) It makes symbolic links with 00-reads folder and samples_id.txt file, which contain the raw data (Fastqc format) and sample names. Moreover, it creates the samplesheet.csv needed for the analyses. 
 
 ```ruby
 ln -s ../00-reads .
@@ -73,16 +102,100 @@ ln -s ../samples_id.txt .
 echo "sample,fastq_1,fastq_2" > samplesheet.csv
 cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz"; done >> samplesheet.csv
 ```
-In addition, the lablog contains the commands necessary to run viralrecon_prod using main.nf from the repository located locally in processing_Data/bioinformatics/pipelines/viralrecon_prod/main.nf. The output from the run is allways stored in a .log file, that allows us to follow the process apart form the kernell. 
+After running those commands, the directory will look as shown below:
+
+```ruby
+date_ANALYSIS01_AMPLICONS_HUMAN/
+├── 00-reads -> ../00-reads
+├── lablog
+├── samplesheet.csv
+└── samples_id.txt -> ../samples_id.txt
+
+```
+
+2) In addition, the lablog contains the commands necessary to run viralrecon_prod using main.nf from the repository located locally in processing_Data/bioinformatics/pipelines/viralrecon_prod/main.nf. The commands will be written in a bash script file in order to run the analysis by bash. The output from the run is allways stored in a .log file, that allows us to follow the process apart form the kernell. 
 
 ```ruby
 echo "nextflow run /processing_Data/bioinformatics/pipelines/viralrecon_prod/main.nf -bg --input samplesheet.csv -profile conda --outdir $(date '+%Y%m%d')_viralrecon_mapping --assemblers none --amplicon_fasta 'https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/genome/NC_045512.2/amplicon/nCoV-2019.artic.V3.primer.fasta' --amplicon_bed 'https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/genome/NC_045512.2/amplicon/nCoV-2019.artic.V3.bed' --kraken2_db /processing_Data/bioinformatics/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz --protocol amplicon --genome NC_045512.2 --save_align_intermeds --skip_vg --skip_markduplicates --save_mpileup --min_allele_freq 0 -resume" > _01_viralrecon_mapping.sh
 ```
 
-After this, a new folder will be created, named $(date '+%Y%m%d')_viralrecon_mapping, where every output from the pipeline will be located, with the following structure: 
+
+3) Moreover, a bash script to create a summary_report and a python script to analyse the percentages of N in every analysed samples are copied in this folder using two commands in the lablog:
 
 ```ruby
-.
+cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/create_summary_report.sh .
+cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/percentajeNs.py .
+```
+`
+
+4) Finally, the directories of $(date '+%Y%m%d')_Pangolin analyses and $(date '+%Y%m%d')variants_table are created. This folderds will include the following results from Pangoling lineages classification and the results of SARS-CoV2 variants. 
+
+```ruby
+mkdir -p $(date '+%Y%m%d')_pangolin
+mkdir -p $(date '+%Y%m%d')_variants_table
+```
+
+3) Moreover, a bash script to create a summary_report and a python script to analyse the percentages of N in every analysed samples are copied in this folder using two commands in the lablog:
+
+```ruby
+cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/create_summary_report.sh .
+cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/percentajeNs.py .
+```
+`
+
+4) Finally, the directories of $(date '+%Y%m%d')_Pangolin analyses and $(date '+%Y%m%d')variants_table are created. This folderds will include the following results from Pangoling lineages classification and the results of SARS-CoV2 variants. 
+
+```ruby
+mkdir -p $(date '+%Y%m%d')_pangolin
+mkdir -p $(date '+%Y%m%d')_variants_table
+```
+At the end of using lablog file commands, the full directory will have the next structure:
+
+```ruby
+date_ANALYSIS01_AMPLICONS_HUMAN/
+├── 00-reads -> ../00-reads
+├── _01_viralrecon_mapping.sh
+├── create_summary_report.sh**
+├── lablog
+├── pangolin
+├── percentajeNs.py
+├── samplesheet.csv
+├── samples_id.txt -> ../samples_id.txt
+├── variants_table
+└── work
+``` 
+***Launching Viralrecon analysis
+
+Once this, we are ready to run viralrecon analysis, which will be launched using nohup command in order to allow the computer to run other tasks independetly of our ssh conection: 
+
+```ruby
+nohup bash _01_viralrecon_mapping.sh &> $(date '+%Y%m%d')_mapping01.log &
+```
+As you may note, the output from the viralrecon pipeline is directed to a .log file, that will allow us to follow in real time the process while our console will be free to run other tasks. Do ```ruby tail -f $(date '+%Y%m%d')_mapping01.log ``` to supervise the pipeline. 
+
+After this, a new folder will be created, named /$(date '+%Y%m%d')_viralrecon_mapping, where every output from the pipeline will be located, with the following structure. In addition, nextflow will create the folder /work, in which every task is isolated in folders. 
+
+
+```ruby
+date_ANALYSIS01_AMPLICONS_HUMAN/
+├── 00-reads -> ../00-reads
+├── _01_viralrecon_mapping.sh
+├── 20210603_mapping01.log
+├── 20210603_viralrecon_mapping
+├── create_summary_report.sh**
+├── lablog
+├── pangolin
+├── percentajeNs.py
+├── samplesheet.csv
+├── samples_id.txt -> ../samples_id.txt
+├── variants_table
+└── work
+``` 
+
+Now, all the data coming from the viralrecon analysis wil be stored in /20210603_viralrecon_mapping folder, which will take the following structure if the analysis is performed correctly (only directories shown).
+
+```ruby
+date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
 ├── assembly
 │   ├── cutadapt
 │   └── kraken2
@@ -100,16 +213,9 @@ After this, a new folder will be created, named $(date '+%Y%m%d')_viralrecon_map
     └── varscan2
 ```
 
-Moreover, a bash script to create a summary_report and a python script to analyse the percentages of N in every analysed samples are copied in this folder using two commands in the lablog:
-
-```ruby
-cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/create_summary_report.sh .
-cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/percentajeNs.py .
-```
-Finally, the directories of $(date '+%Y%m%d')_Pangolin analyses and $(date '+%Y%m%d')variants_table are created. This folderds will include the following results from Pangoling lineages classification and the results of SARS-CoV2 variants. 
-
 
 2. Analysis_02_Met. 
+
 
 
 date_ANALYSIS01_AMPLICONS_HUMAN. 
