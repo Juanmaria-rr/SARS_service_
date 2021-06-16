@@ -202,7 +202,6 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
 ```
     date_viralrecon_mapping
     
-    
 <details>
   <summary>Click here to see the Summary of the resulting data structure from virarecon_mapping folder</summary>
     
@@ -287,7 +286,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
         │       └── icarus_viewers
         └── snpeff
 
-<summary>
+</summary>
 
     
 **Directories + sample_name files
@@ -713,7 +712,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
             ├── 214704.snpEff.vcf.gz.tbi
             ├── 214704.snpSift.table.txt
 ```    
-<details>
+</details>
     
 ----------------------
 
