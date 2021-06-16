@@ -160,7 +160,7 @@ Once this, we are ready to run viralrecon analysis, which will be launched using
 nohup bash _01_viralrecon_mapping.sh &> $(date '+%Y%m%d')_mapping01.log &
 ```
 
-As you may note, the output from the viralrecon pipeline is directed to a .log file, that will allow us to follow in real time the process while our console will be free to run other tasks. Do ```ruby tail -f $(date '+%Y%m%d')_mapping01.log ``` to supervise the pipeline. 
+As you may note, the output from the viralrecon pipeline is directed to a .log file, that will allow us to follow in real time the process while our console will be free to run other tasks. Do ``` tail -f $(date '+%Y%m%d')_mapping01.log ``` to supervise the pipeline. 
 
 
 <details>
