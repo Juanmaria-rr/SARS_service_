@@ -38,7 +38,7 @@ SRVxxxx_date_SARS_>researcher_name>
 
 ```
 
-In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty (¿?).
+In ANALYSIS folder all the analysis process will run and store the derived data and results. In RAW, inside a folder named with the RUN there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty (¿?).
 
 # /ANALYSIS
 
