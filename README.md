@@ -39,7 +39,7 @@ In this folder there will be other directories:
 
 In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN  there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty. 
 
-**ANALYSIS_folder**
+# ANALYSIS
 
 ```ruby
 ANALYSIS
@@ -49,7 +49,7 @@ ANALYSIS
 ├── lablog
 └── samples_id.txt
 ```
-Lablog - 
+- lablog 
 
 It contains the commands necesary to make the sample_id.txt file, which is derived from all the samples located in the RAW folder. It also has the commands to create the other two folders in which the analysis will be splited:
 
@@ -59,11 +59,11 @@ mkdir -p 00-reads
 mkdir -p $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
 mkdir -p $(date '+%Y%m%d')_ANALYSIS02_MET
 ```
-samples_id.txt - 
+- samples_id.txt - 
 
 Is a list with the <sample_name> derived from the samples files .fastq.gz stored in the folder RAW.
 
-**/00-reads. 
+**00-reads. 
 
 ```ruby
 ANALYSIS/00-reads/
@@ -84,19 +84,15 @@ ANALYSIS/00-reads/
 └── lablog
 ```
 
-/date_ANALYSIS01_AMPLICONS_HUMAN
+**/$(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
 
 ```ruby
 20210531_ANALYSIS01_AMPLICONS_HUMAN/
 └── lablog
 ```
-**Lablog
+- Lablog
 
 To note: this lablog has to be copied from the previous service performed. This lablog is the essential file which all the analysis and directories organization will be contructed from. IThis lablog perform the next tasks: 
-
-
-date_ANALYSIS01_AMPLICONS_HUMAN.  
-
 
 1) It makes symbolic links with 00-reads folder and samples_id.txt file, which contain the raw data (Fastqc format) and sample names. Moreover, it creates the samplesheet.csv needed for the analyses. 
 
@@ -114,7 +110,6 @@ date_ANALYSIS01_AMPLICONS_HUMAN/
 ├── lablog
 ├── samplesheet.csv
 └── samples_id.txt -> ../samples_id.txt
-
 ```
 
 2) In addition, the lablog contains the commands necessary to run viralrecon_prod using main.nf from the repository located locally in processing_Data/bioinformatics/pipelines/viralrecon_prod/main.nf. The commands will be written in a bash script file in order to run the analysis by bash. The output from the run is allways stored in a .log file, that allows us to follow the process apart form the kernell. 
@@ -129,7 +124,6 @@ echo "nextflow run /processing_Data/bioinformatics/pipelines/viralrecon_prod/mai
 cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/create_summary_report.sh .
 cp /processing_Data/bioinformatics/services_and_colaborations/CNM/virologia/SRVCNM327_20210201_SARSCOV228_icasas_S/ANALYSIS/20210201_ANALYSIS01_AMPLICONS_HUMAN/percentajeNs.py .
 ```
-`
 
 4) Finally, the directories of $(date '+%Y%m%d')_Pangolin analyses and $(date '+%Y%m%d')variants_table are created. This folderds will include the following results from Pangoling lineages classification and the results of SARS-CoV2 variants. 
 
@@ -140,7 +134,7 @@ mkdir -p $(date '+%Y%m%d')_variants_table
 At the end of using lablog file commands, the full directory will have the next structure:
 
 ```ruby
-date_ANALYSIS01_AMPLICONS_HUMAN/
+$(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN/
 ├── 00-reads -> ../00-reads
 ├── _01_viralrecon_mapping.sh
 ├── create_summary_report.sh**
@@ -152,7 +146,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/
 ├── variants_table
 └── work
 ``` 
-***Launching Viralrecon analysis
+**Launching Viralrecon analysis
 
 Once this, we are ready to run viralrecon analysis, which will be launched using nohup command in order to allow the computer to run other tasks independetly of our ssh conection: 
 
@@ -160,7 +154,7 @@ Once this, we are ready to run viralrecon analysis, which will be launched using
 nohup bash _01_viralrecon_mapping.sh &> $(date '+%Y%m%d')_mapping01.log &
 ```
 
-As you may note, the output from the viralrecon pipeline is directed to a .log file, that will allow us to follow in real time the process while our console will be free to run other tasks. Do ``` tail -f $(date '+%Y%m%d')_mapping01.log ``` to supervise the pipeline. 
+As you can see in the code above, the output from the viralrecon pipeline is directed to a .log file, that will allow us to follow in real time the process while our console will be free to run other tasks. Do ``` tail -f $(date '+%Y%m%d')_mapping01.log ``` to supervise the pipeline. 
 
 
 <details>
@@ -199,7 +193,7 @@ Regarding the Analysis of variants (folder Analysis_01), samples are processed a
 </details>
 
 
-After this, a new folder will be created, named /$(date '+%Y%m%d')_viralrecon_mapping, where every output from the pipeline will be located, with the following structure. In addition, nextflow will create the folder /work, in which every task is isolated in folders. 
+After this, a new folder will be created, named /$(date '+%Y%m%d')_viralrecon_mapping, where every output from the pipeline will be located, with the following structure.
 
 
 ```ruby
@@ -217,6 +211,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/
 ├── variants_table
 └── work
 ``` 
+In addition, nextflow will create the folder /work, in which every task is isolated in folders. If any error appears during the pipeline, we can look for the step in the folders ``` /work/<number_id>``` 
 
 Now, all the data coming from the viralrecon analysis is located in /20210603_viralrecon_mapping folder, which will take the following structure if the analysis is performed correctly (only directories shown).
 
@@ -238,8 +233,6 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
     ├── ivar
     └── varscan2
 ```
-
-date_viralrecon_mapping
     
 <details>
   <summary>Click here to see the Summary of the resulting data structure from virarecon_mapping folder</summary>
@@ -329,15 +322,15 @@ date_viralrecon_mapping
 ├── assembly
 │   ├── cutadapt
 │   │   ├── fastqc
-│   │   │   ├── 214704_1.ptrim_fastqc.html
-│   │   │   ├── 214704_2.ptrim_fastqc.html
+│   │   │   ├── <sample_name>_1.ptrim_fastqc.html
+│   │   │   ├── <sample_name>_2.ptrim_fastqc.html
 │   │   │   └── zips
-│   │   │       ├── 214704_1.ptrim_fastqc.zip
-│   │   │       ├── 214704_2.ptrim_fastqc.zip
+│   │   │       ├── <sample_name>_1.ptrim_fastqc.zip
+│   │   │       ├── <sample_name>_2.ptrim_fastqc.zip
 │   │   └── log
-│   │       ├── 214704.cutadapt.log
+│   │       ├── <sample_name>.cutadapt.log
 │   ├── kraken2
-│   │   ├── 214704.kraken2.report.txt
+│   │   ├── <sample_name>.kraken2.report.txt
 │   └── summary_assembly_metrics_mqc.tsv
 ├── multiqc
 │   ├── multiqc_data
@@ -389,119 +382,119 @@ date_viralrecon_mapping
 │   └── software_versions.csv
 ├── preprocess
 │   ├── fastp
-│   │   ├── 214704.fastp.html
-│   │   ├── 214704.fastp.json
+│   │   ├── <sample_name>.fastp.html
+│   │   ├── <sample_name>.fastp.json
 │   │   ├── fastqc
-│   │   │   ├── 214704_1.trim_fastqc.html
-│   │   │   ├── 214704_2.trim_fastqc.html
+│   │   │   ├── <sample_name>_1.trim_fastqc.html
+│   │   │   ├── <sample_name>_2.trim_fastqc.html
 │   │   │   └── zips
-│   │   │       ├── 214704_1.trim_fastqc.zip
-│   │   │       ├── 214704_2.trim_fastqc.zip
+│   │   │       ├── <sample_name>_1.trim_fastqc.zip
+│   │   │       ├── <sample_name>_2.trim_fastqc.zip
 │   │   └── log
-│   │       ├── 214704.fastp.log
+│   │       ├── <sample_name>.fastp.log
 │   └── fastqc
-│       ├── 214704_1.merged_fastqc.html
-│       ├── 214704_2.merged_fastqc.html
+│       ├── <sample_name>_1.merged_fastqc.html
+│       ├── <sample_name>_2.merged_fastqc.html
 │       └── zips
-│           ├── 214704_1.merged_fastqc.zip
-│           ├── 214704_2.merged_fastqc.zip
+│           ├── <sample_name>_1.merged_fastqc.zip
+│           ├── <sample_name>_2.merged_fastqc.zip
 └── variants
     ├── bam
-    │   ├── 214704.bam
-    │   ├── 214704.sorted.bam
-    │   ├── 214704.sorted.bam.bai
-    │   ├── 214704.trim.sorted.bam
-    │   ├── 214704.trim.sorted.bam.bai
+    │   ├── <sample_name>.bam
+    │   ├── <sample_name>.sorted.bam
+    │   ├── <sample_name>.sorted.bam.bai
+    │   ├── <sample_name>.trim.sorted.bam
+    │   ├── <sample_name>.trim.sorted.bam.bai
     │   ├── log
-    │   │   ├── 214704.bowtie2.log
-    │   │   ├── 214704.trim.ivar.log
+    │   │   ├── <sample_name>.bowtie2.log
+    │   │   ├── <sample_name>.trim.ivar.log
     │   ├── mosdepth
     │   │   ├── amplicon
-    │   │   │   ├── 214704.trim.amplicon.mosdepth.global.dist.txt
-    │   │   │   ├── 214704.trim.amplicon.mosdepth.region.dist.txt
-    │   │   │   ├── 214704.trim.amplicon.mosdepth.summary.txt
-    │   │   │   ├── 214704.trim.amplicon.per-base.bed.gz
-    │   │   │   ├── 214704.trim.amplicon.per-base.bed.gz.csi
-    │   │   │   ├── 214704.trim.amplicon.regions.bed.gz
-    │   │   │   ├── 214704.trim.amplicon.regions.bed.gz.csi
-    │   │   │   ├── 214704.trim.amplicon.thresholds.bed.gz
-    │   │   │   ├── 214704.trim.amplicon.thresholds.bed.gz.csi
+    │   │   │   ├── <sample_name>.trim.amplicon.mosdepth.global.dist.txt
+    │   │   │   ├── <sample_name>.trim.amplicon.mosdepth.region.dist.txt
+    │   │   │   ├── <sample_name>.trim.amplicon.mosdepth.summary.txt
+    │   │   │   ├── <sample_name>.trim.amplicon.per-base.bed.gz
+    │   │   │   ├── <sample_name>.trim.amplicon.per-base.bed.gz.csi
+    │   │   │   ├── <sample_name>.trim.amplicon.regions.bed.gz
+    │   │   │   ├── <sample_name>.trim.amplicon.regions.bed.gz.csi
+    │   │   │   ├── <sample_name>.trim.amplicon.thresholds.bed.gz
+    │   │   │   ├── <sample_name>.trim.amplicon.thresholds.bed.gz.csi
     │   │   │   └── plots
-    │   │   │       ├── 214704.trim.amplicon.regions.coverage.pdf
-    │   │   │       ├── 214704.trim.amplicon.regions.coverage.tsv
+    │   │   │       ├── <sample_name>.trim.amplicon.regions.coverage.pdf
+    │   │   │       ├── <sample_name>.trim.amplicon.regions.coverage.tsv
     │   │   │       ├── all_samples.trim.amplicon.regions.coverage.tsv
     │   │   │       └── all_samples.trim.amplicon.regions.heatmap.pdf
     │   │   └── genome
-    │   │       ├── 214704.trim.genome.mosdepth.global.dist.txt
-    │   │       ├── 214704.trim.genome.mosdepth.region.dist.txt
-    │   │       ├── 214704.trim.genome.mosdepth.summary.txt
-    │   │       ├── 214704.trim.genome.per-base.bed.gz
-    │   │       ├── 214704.trim.genome.per-base.bed.gz.csi
-    │   │       ├── 214704.trim.genome.regions.bed.gz
-    │   │       ├── 214704.trim.genome.regions.bed.gz.csi
+    │   │       ├── <sample_name>.trim.genome.mosdepth.global.dist.txt
+    │   │       ├── <sample_name>.trim.genome.mosdepth.region.dist.txt
+    │   │       ├── <sample_name>.trim.genome.mosdepth.summary.txt
+    │   │       ├── <sample_name>.trim.genome.per-base.bed.gz
+    │   │       ├── <sample_name>.trim.genome.per-base.bed.gz.csi
+    │   │       ├── <sample_name>.trim.genome.regions.bed.gz
+    │   │       ├── <sample_name>.trim.genome.regions.bed.gz.csi
     │   │       └── plots
-    │   │           ├── 214704.trim.genome.regions.coverage.pdf
-    │   │           ├── 214704.trim.genome.regions.coverage.tsv
+    │   │           ├── <sample_name>.trim.genome.regions.coverage.pdf
+    │   │           ├── <sample_name>.trim.genome.regions.coverage.tsv
     │   │           └── all_samples.trim.genome.regions.coverage.tsv
     │   ├── mpileup
-    │   │   ├── 214704.trim.mpileup
+    │   │   ├── <sample_name>.trim.mpileup
     │   ├── picard_metrics
-    │   │   ├── 214704.trim.CollectMultipleMetrics.alignment_summary_metrics
-    │   │   ├── 214704.trim.CollectMultipleMetrics.base_distribution_by_cycle_metrics
-    │   │   ├── 214704.trim.CollectMultipleMetrics.base_distribution_by_cycle.pdf
-    │   │   ├── 214704.trim.CollectMultipleMetrics.insert_size_histogram.pdf
-    │   │   ├── 214704.trim.CollectMultipleMetrics.insert_size_metrics
-    │   │   ├── 214704.trim.CollectMultipleMetrics.quality_by_cycle_metrics
-    │   │   ├── 214704.trim.CollectMultipleMetrics.quality_by_cycle.pdf
-    │   │   ├── 214704.trim.CollectMultipleMetrics.quality_distribution_metrics
-    │   │   ├── 214704.trim.CollectMultipleMetrics.quality_distribution.pdf
-    │   │   ├── 214704.trim.CollectWgsMetrics.coverage_metrics
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.alignment_summary_metrics
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.base_distribution_by_cycle_metrics
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.base_distribution_by_cycle.pdf
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.insert_size_histogram.pdf
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.insert_size_metrics
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_by_cycle_metrics
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_by_cycle.pdf
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_distribution_metrics
+    │   │   ├── <sample_name>.trim.CollectMultipleMetrics.quality_distribution.pdf
+    │   │   ├── <sample_name>.trim.CollectWgsMetrics.coverage_metrics
     │   └── samtools_stats
-    │       ├── 214704.sorted.bam.flagstat
-    │       ├── 214704.sorted.bam.idxstats
-    │       ├── 214704.sorted.bam.stats
-    │       ├── 214704.trim.sorted.bam.flagstat
-    │       ├── 214704.trim.sorted.bam.idxstats
-    │       ├── 214704.trim.sorted.bam.stats
+    │       ├── <sample_name>.sorted.bam.flagstat
+    │       ├── <sample_name>.sorted.bam.idxstats
+    │       ├── <sample_name>.sorted.bam.stats
+    │       ├── <sample_name>.trim.sorted.bam.flagstat
+    │       ├── <sample_name>.trim.sorted.bam.idxstats
+    │       ├── <sample_name>.trim.sorted.bam.stats
     ├── bcftools
-    │   ├── 214704.vcf.gz
-    │   ├── 214704.vcf.gz.tbi
+    │   ├── <sample_name>.vcf.gz
+    │   ├── <sample_name>.vcf.gz.tbi
     │   ├── bcftools_stats
-    │   │   ├── 214704.bcftools_stats.txt
+    │   │   ├── <sample_name>.bcftools_stats.txt
     │   ├── consensus
-    │   │   ├── 214704.consensus.masked.fa
+    │   │   ├── <sample_name>.consensus.masked.fa
     │   │   └── base_qc
-    │   │       ├── 214704.ACTG_density.pdf
-    │   │       ├── 214704.base_counts.pdf
-    │   │       ├── 214704.base_counts.tsv
-    │   │       ├── 214704.N_density.pdf
-    │   │       ├── 214704.N_run.tsv
+    │   │       ├── <sample_name>.ACTG_density.pdf
+    │   │       ├── <sample_name>.base_counts.pdf
+    │   │       ├── <sample_name>.base_counts.tsv
+    │   │       ├── <sample_name>.N_density.pdf
+    │   │       ├── <sample_name>.N_run.tsv
     │   ├── quast
     │   │   ├── aligned_stats
     │   │   │   ├── cumulative_plot.pdf
     │   │   │   ├── NAx_plot.pdf
     │   │   │   └── NGAx_plot.pdf
     │   │   ├── basic_stats
-    │   │   │   ├── 214704.consensus.masked_GC_content_plot.pdf
+    │   │   │   ├── <sample_name>.consensus.masked_GC_content_plot.pdf
     │   │   │   ├── cumulative_plot.pdf
     │   │   │   ├── GC_content_plot.pdf
     │   │   │   ├── gc.icarus.txt
     │   │   │   ├── NGx_plot.pdf
     │   │   │   └── Nx_plot.pdf
     │   │   ├── contigs_reports
-    │   │   │   ├── 214704_consensus_masked.mis_contigs.fa
-    │   │   │   ├── all_alignments_214704-consensus-masked.tsv
-    │   │   │   ├── contigs_report_214704-consensus-masked.mis_contigs.info
-    │   │   │   ├── contigs_report_214704-consensus-masked.stderr
-    │   │   │   ├── contigs_report_214704-consensus-masked.stdout
-    │   │   │   ├── contigs_report_214704-consensus-masked.unaligned.info
+    │   │   │   ├── <sample_name>_consensus_masked.mis_contigs.fa
+    │   │   │   ├── all_alignments_<sample_name>-consensus-masked.tsv
+    │   │   │   ├── contigs_report_<sample_name>-consensus-masked.mis_contigs.info
+    │   │   │   ├── contigs_report_<sample_name>-consensus-masked.stderr
+    │   │   │   ├── contigs_report_<sample_name>-consensus-masked.stdout
+    │   │   │   ├── contigs_report_<sample_name>-consensus-masked.unaligned.info
     │   │   │   ├── minimap_output
-    │   │   │   │   ├── 214704-consensus-masked.coords
-    │   │   │   │   ├── 214704-consensus-masked.coords.filtered
-    │   │   │   │   ├── 214704-consensus-masked.coords_tmp
-    │   │   │   │   ├── 214704-consensus-masked.sf
-    │   │   │   │   ├── 214704-consensus-masked.unaligned
-    │   │   │   │   ├── 214704-consensus-masked.used_snps.gz
+    │   │   │   │   ├── <sample_name>-consensus-masked.coords
+    │   │   │   │   ├── <sample_name>-consensus-masked.coords.filtered
+    │   │   │   │   ├── <sample_name>-consensus-masked.coords_tmp
+    │   │   │   │   ├── <sample_name>-consensus-masked.sf
+    │   │   │   │   ├── <sample_name>-consensus-masked.unaligned
+    │   │   │   │   ├── <sample_name>-consensus-masked.used_snps.gz
     │   │   │   ├── misassemblies_frcurve_plot.pdf
     │   │   │   ├── misassemblies_plot.pdf
     │   │   │   ├── misassemblies_report.tex
@@ -514,8 +507,8 @@ date_viralrecon_mapping
     │   │   │   ├── unaligned_report.tsv
     │   │   │   └── unaligned_report.txt
     │   │   ├── genome_stats
-    │   │   │   ├── 214704-consensus-masked_gaps.txt
-    │   │   │   ├── 214704-consensus-masked_genomic_features_any.txt
+    │   │   │   ├── <sample_name>-consensus-masked_gaps.txt
+    │   │   │   ├── <sample_name>-consensus-masked_genomic_features_any.txt
     │   │   │   ├── complete_features_histogram.pdf
     │   │   │   ├── features_cumulative_plot.pdf
     │   │   │   ├── features_frcurve_plot.pdf
@@ -535,14 +528,14 @@ date_viralrecon_mapping
     │   │   ├── transposed_report.tsv
     │   │   └── transposed_report.txt
     │   └── snpeff
-    │       ├── 214704.snpEff.csv
-    │       ├── 214704.snpEff.genes.txt
-    │       ├── 214704.snpEff.summary.html
-    │       ├── 214704.snpEff.vcf.gz
-    │       ├── 214704.snpEff.vcf.gz.tbi
-    │       ├── 214704.snpSift.table.txt
+    │       ├── <sample_name>.snpEff.csv
+    │       ├── <sample_name>.snpEff.genes.txt
+    │       ├── <sample_name>.snpEff.summary.html
+    │       ├── <sample_name>.snpEff.vcf.gz
+    │       ├── <sample_name>.snpEff.vcf.gz.tbi
+    │       ├── <sample_name>.snpSift.table.txt
     ├── intersect
-    │   ├── 214704
+    │   ├── <sample_name>
     │       ├── 0000.vcf.gz
     │       ├── 0000.vcf.gz.tbi
     │       ├── 0001.vcf.gz
@@ -552,28 +545,28 @@ date_viralrecon_mapping
     │       ├── README.txt
     │       └── sites.txt
     ├── ivar
-    │   ├── 214704.AF0.75.vcf.gz
-    │   ├── 214704.AF0.75.vcf.gz.tbi
-    │   ├── 214704.tsv
-    │   ├── 214704.vcf.gz
-    │   ├── 214704.vcf.gz.tbi
+    │   ├── <sample_name>.AF0.75.vcf.gz
+    │   ├── <sample_name>.AF0.75.vcf.gz.tbi
+    │   ├── <sample_name>.tsv
+    │   ├── <sample_name>.vcf.gz
+    │   ├── <sample_name>.vcf.gz.tbi
     │   ├── bcftools_stats
-    │   │   ├── 214704.AF0.75.bcftools_stats.txt
-    │   │   ├── 214704.bcftools_stats.txt
+    │   │   ├── <sample_name>.AF0.75.bcftools_stats.txt
+    │   │   ├── <sample_name>.bcftools_stats.txt
     │   ├── consensus
-    │   │   ├── 214704.AF0.75.consensus.fa
-    │   │   ├── 214704.AF0.75.consensus.qual.txt
+    │   │   ├── <sample_name>.AF0.75.consensus.fa
+    │   │   ├── <sample_name>.AF0.75.consensus.qual.txt
     │   │   └── base_qc
-    │   │       ├── 214704.AF0.75.ACTG_density.pdf
-    │   │       ├── 214704.AF0.75.base_counts.pdf
-    │   │       ├── 214704.AF0.75.base_counts.tsv
-    │   │       ├── 214704.AF0.75.N_density.pdf
-    │   │       ├── 214704.AF0.75.N_run.tsv
-    │   │       ├── 214704.AF0.75.R_density.pdf
-    │   │       ├── 214704.AF0.75.Y_density.pdf
+    │   │       ├── <sample_name>.AF0.75.ACTG_density.pdf
+    │   │       ├── <sample_name>.AF0.75.base_counts.pdf
+    │   │       ├── <sample_name>.AF0.75.base_counts.tsv
+    │   │       ├── <sample_name>.AF0.75.N_density.pdf
+    │   │       ├── <sample_name>.AF0.75.N_run.tsv
+    │   │       ├── <sample_name>.AF0.75.R_density.pdf
+    │   │       ├── <sample_name>.AF0.75.Y_density.pdf
     │   ├── log
-    │   │   ├── 214704.AF0.75.variant.counts.log
-    │   │   ├── 214704.variant.counts.log
+    │   │   ├── <sample_name>.AF0.75.variant.counts.log
+    │   │   ├── <sample_name>.variant.counts.log
     │   ├── quast
     │   │   └── AF0.75
     │   │       ├── aligned_stats
@@ -581,26 +574,26 @@ date_viralrecon_mapping
     │   │       │   ├── NAx_plot.pdf
     │   │       │   └── NGAx_plot.pdf
     │   │       ├── basic_stats
-    │   │       │   ├── 214704.AF0.75.consensus_GC_content_plot.pdf
+    │   │       │   ├── <sample_name>.AF0.75.consensus_GC_content_plot.pdf
     │   │       │   ├── cumulative_plot.pdf
     │   │       │   ├── GC_content_plot.pdf
     │   │       │   ├── gc.icarus.txt
     │   │       │   ├── NGx_plot.pdf
     │   │       │   └── Nx_plot.pdf
     │   │       ├── contigs_reports
-    │   │       │   ├── 214704_AF0_75_consensus.mis_contigs.fa
-    │   │       │   ├── all_alignments_214704-AF0-75-consensus.tsv
-    │   │       │   ├── contigs_report_214704-AF0-75-consensus.mis_contigs.info
-    │   │       │   ├── contigs_report_214704-AF0-75-consensus.stderr
-    │   │       │   ├── contigs_report_214704-AF0-75-consensus.stdout
-    │   │       │   ├── contigs_report_214704-AF0-75-consensus.unaligned.info
+    │   │       │   ├── <sample_name>_AF0_75_consensus.mis_contigs.fa
+    │   │       │   ├── all_alignments_<sample_name>-AF0-75-consensus.tsv
+    │   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.mis_contigs.info
+    │   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.stderr
+    │   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.stdout
+    │   │       │   ├── contigs_report_<sample_name>-AF0-75-consensus.unaligned.info
     │   │       │   ├── minimap_output
-    │   │       │   │   ├── 214704-AF0-75-consensus.coords
-    │   │       │   │   ├── 214704-AF0-75-consensus.coords.filtered
-    │   │       │   │   ├── 214704-AF0-75-consensus.coords_tmp
-    │   │       │   │   ├── 214704-AF0-75-consensus.sf
-    │   │       │   │   ├── 214704-AF0-75-consensus.unaligned
-    │   │       │   │   ├── 214704-AF0-75-consensus.used_snps.gz
+    │   │       │   │   ├── <sample_name>-AF0-75-consensus.coords
+    │   │       │   │   ├── <sample_name>-AF0-75-consensus.coords.filtered
+    │   │       │   │   ├── <sample_name>-AF0-75-consensus.coords_tmp
+    │   │       │   │   ├── <sample_name>-AF0-75-consensus.sf
+    │   │       │   │   ├── <sample_name>-AF0-75-consensus.unaligned
+    │   │       │   │   ├── <sample_name>-AF0-75-consensus.used_snps.gz
     │   │       │   ├── misassemblies_frcurve_plot.pdf
     │   │       │   ├── misassemblies_plot.pdf
     │   │       │   ├── misassemblies_report.tex
@@ -613,8 +606,8 @@ date_viralrecon_mapping
     │   │       │   ├── unaligned_report.tsv
     │   │       │   └── unaligned_report.txt
     │   │       ├── genome_stats
-    │   │       │   ├── 214704-AF0-75-consensus_gaps.txt
-    │   │       │   ├── 214704-AF0-75-consensus_genomic_features_any.txt
+    │   │       │   ├── <sample_name>-AF0-75-consensus_gaps.txt
+    │   │       │   ├── <sample_name>-AF0-75-consensus_genomic_features_any.txt
     │   │       │   ├── complete_features_histogram.pdf
     │   │       │   ├── features_cumulative_plot.pdf
     │   │       │   ├── features_frcurve_plot.pdf
@@ -634,41 +627,41 @@ date_viralrecon_mapping
     │   │       ├── transposed_report.tsv
     │   │       └── transposed_report.txt
     │   └── snpeff
-    │       ├── 214704.AF0.75.snpEff.csv
-    │       ├── 214704.AF0.75.snpEff.genes.txt
-    │       ├── 214704.AF0.75.snpEff.summary.html
-    │       ├── 214704.AF0.75.snpEff.vcf.gz
-    │       ├── 214704.AF0.75.snpEff.vcf.gz.tbi
-    │       ├── 214704.AF0.75.snpSift.table.txt
-    │       ├── 214704.snpEff.csv
-    │       ├── 214704.snpEff.genes.txt
-    │       ├── 214704.snpEff.summary.html
-    │       ├── 214704.snpEff.vcf.gz
-    │       ├── 214704.snpEff.vcf.gz.tbi
-    │       ├── 214704.snpSift.table.txt
+    │       ├── <sample_name>.AF0.75.snpEff.csv
+    │       ├── <sample_name>.AF0.75.snpEff.genes.txt
+    │       ├── <sample_name>.AF0.75.snpEff.summary.html
+    │       ├── <sample_name>.AF0.75.snpEff.vcf.gz
+    │       ├── <sample_name>.AF0.75.snpEff.vcf.gz.tbi
+    │       ├── <sample_name>.AF0.75.snpSift.table.txt
+    │       ├── <sample_name>.snpEff.csv
+    │       ├── <sample_name>.snpEff.genes.txt
+    │       ├── <sample_name>.snpEff.summary.html
+    │       ├── <sample_name>.snpEff.vcf.gz
+    │       ├── <sample_name>.snpEff.vcf.gz.tbi
+    │       ├── <sample_name>.snpSift.table.txt
     │       ├── snpSift_template2.txt
     │       ├── snpSift_template_filtered.txt
     │       └── snpSift_template.txt
     ├── summary_variants_metrics_mqc.tsv
     └── varscan2
-        ├── 214704.AF0.75.vcf.gz
-        ├── 214704.AF0.75.vcf.gz.tbi
-        ├── 214704.vcf.gz
-        ├── 214704.vcf.gz.tbi
+        ├── <sample_name>.AF0.75.vcf.gz
+        ├── <sample_name>.AF0.75.vcf.gz.tbi
+        ├── <sample_name>.vcf.gz
+        ├── <sample_name>.vcf.gz.tbi
         ├── bcftools_stats
-        │   ├── 214704.AF0.75.bcftools_stats.txt
-        │   ├── 214704.bcftools_stats.txt
+        │   ├── <sample_name>.AF0.75.bcftools_stats.txt
+        │   ├── <sample_name>.bcftools_stats.txt
         ├── consensus
-        │   ├── 214704.AF0.75.consensus.masked.fa
+        │   ├── <sample_name>.AF0.75.consensus.masked.fa
         │   ├── base_qc
-        │   │   ├── 214704.AF0.75.ACTG_density.pdf
-        │   │   ├── 214704.AF0.75.base_counts.pdf
-        │   │   ├── 214704.AF0.75.base_counts.tsv
-        │   │   ├── 214704.AF0.75.N_density.pdf
-        │   │   ├── 214704.AF0.75.N_run.tsv
+        │   │   ├── <sample_name>.AF0.75.ACTG_density.pdf
+        │   │   ├── <sample_name>.AF0.75.base_counts.pdf
+        │   │   ├── <sample_name>.AF0.75.base_counts.tsv
+        │   │   ├── <sample_name>.AF0.75.N_density.pdf
+        │   │   ├── <sample_name>.AF0.75.N_run.tsv
         │   └── snpSift_template.txt
         ├── log
-        │   ├── 214704.varscan2.log
+        │   ├── <sample_name>.varscan2.log
         ├── quast
         │   └── AF0.75
         │       ├── aligned_stats
@@ -676,26 +669,26 @@ date_viralrecon_mapping
         │       │   ├── NAx_plot.pdf
         │       │   └── NGAx_plot.pdf
         │       ├── basic_stats
-        │       │   ├── 214704.AF0.75.consensus.masked_GC_content_plot.pdf
+        │       │   ├── <sample_name>.AF0.75.consensus.masked_GC_content_plot.pdf
         │       │   ├── cumulative_plot.pdf
         │       │   ├── GC_content_plot.pdf
         │       │   ├── gc.icarus.txt
         │       │   ├── NGx_plot.pdf
         │       │   └── Nx_plot.pdf
         │       ├── contigs_reports
-        │       │   ├── 214704_AF0_75_consensus_masked.mis_contigs.fa
-        │       │   ├── all_alignments_214704-AF0-75-consensus-masked.tsv
-        │       │   ├── contigs_report_214704-AF0-75-consensus-masked.mis_contigs.info
-        │       │   ├── contigs_report_214704-AF0-75-consensus-masked.stderr
-        │       │   ├── contigs_report_214704-AF0-75-consensus-masked.stdout
-        │       │   ├── contigs_report_214704-AF0-75-consensus-masked.unaligned.info
+        │       │   ├── <sample_name>_AF0_75_consensus_masked.mis_contigs.fa
+        │       │   ├── all_alignments_<sample_name>-AF0-75-consensus-masked.tsv
+        │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.mis_contigs.info
+        │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.stderr
+        │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.stdout
+        │       │   ├── contigs_report_<sample_name>-AF0-75-consensus-masked.unaligned.info
         │       │   ├── minimap_output
-        │       │   │   ├── 214704-AF0-75-consensus-masked.coords
-        │       │   │   ├── 214704-AF0-75-consensus-masked.coords.filtered
-        │       │   │   ├── 214704-AF0-75-consensus-masked.coords_tmp
-        │       │   │   ├── 214704-AF0-75-consensus-masked.sf
-        │       │   │   ├── 214704-AF0-75-consensus-masked.unaligned
-        │       │   │   ├── 214704-AF0-75-consensus-masked.used_snps.gz
+        │       │   │   ├── <sample_name>-AF0-75-consensus-masked.coords
+        │       │   │   ├── <sample_name>-AF0-75-consensus-masked.coords.filtered
+        │       │   │   ├── <sample_name>-AF0-75-consensus-masked.coords_tmp
+        │       │   │   ├── <sample_name>-AF0-75-consensus-masked.sf
+        │       │   │   ├── <sample_name>-AF0-75-consensus-masked.unaligned
+        │       │   │   ├── <sample_name>-AF0-75-consensus-masked.used_snps.gz
         │       │   ├── misassemblies_frcurve_plot.pdf
         │       │   ├── misassemblies_plot.pdf
         │       │   ├── misassemblies_report.tex
@@ -708,8 +701,8 @@ date_viralrecon_mapping
         │       │   ├── unaligned_report.tsv
         │       │   └── unaligned_report.txt
         │       ├── genome_stats
-        │       │   ├── 214704-AF0-75-consensus-masked_gaps.txt
-        │       │   ├── 214704-AF0-75-consensus-masked_genomic_features_any.txt
+        │       │   ├── <sample_name>-AF0-75-consensus-masked_gaps.txt
+        │       │   ├── <sample_name>-AF0-75-consensus-masked_genomic_features_any.txt
         │       │   ├── complete_features_histogram.pdf
         │       │   ├── features_cumulative_plot.pdf
         │       │   ├── features_frcurve_plot.pdf
@@ -729,29 +722,26 @@ date_viralrecon_mapping
         │       ├── transposed_report.tsv
         │       └── transposed_report.txt
         └── snpeff
-            ├── 214704.AF0.75.snpEff.csv
-            ├── 214704.AF0.75.snpEff.genes.txt
-            ├── 214704.AF0.75.snpEff.summary.html
-            ├── 214704.AF0.75.snpEff.vcf.gz
-            ├── 214704.AF0.75.snpEff.vcf.gz.tbi
-            ├── 214704.AF0.75.snpSift.table.txt
-            ├── 214704.snpEff.csv
-            ├── 214704.snpEff.genes.txt
-            ├── 214704.snpEff.summary.html
-            ├── 214704.snpEff.vcf.gz
-            ├── 214704.snpEff.vcf.gz.tbi
-            ├── 214704.snpSift.table.txt
+            ├── <sample_name>.AF0.75.snpEff.csv
+            ├── <sample_name>.AF0.75.snpEff.genes.txt
+            ├── <sample_name>.AF0.75.snpEff.summary.html
+            ├── <sample_name>.AF0.75.snpEff.vcf.gz
+            ├── <sample_name>.AF0.75.snpEff.vcf.gz.tbi
+            ├── <sample_name>.AF0.75.snpSift.table.txt
+            ├── <sample_name>.snpEff.csv
+            ├── <sample_name>.snpEff.genes.txt
+            ├── <sample_name>.snpEff.summary.html
+            ├── <sample_name>.snpEff.vcf.gz
+            ├── <sample_name>.snpEff.vcf.gz.tbi
+            ├── <sample_name>.snpSift.table.txt
 ```    
     
 </details>
     
     
-----------------------
+** $(date '+%Y%m%d')_ANALYSIS02_MET.    
 
-
-/date_ANALYSIS02_MET.    
-
-**Lablog
+- Lablog
 
 Includes the commands to make symbolic links with 00-reads and samples_id.txt files from the main "Analysis" directory. It also has the nextflow run command neccesary to perform the metagenomic analysis using the main.nf file using the mag repository data taken from "/processing_Data/bioinformatics/pipelines/mag/main.nf", to make date_mag folder and performed the metagnomic classification using Kraken from "/processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz" included in the _01_mag.sh. As in viralrecon analysis, the output of _01_mag.sh will be redirected to a .log in order to follow the run. The content of the lablog is shown in the following lines: 
 
@@ -776,7 +766,7 @@ After this, the directory should be like this:
 As seen for viralrecon analyses, we run this pipeline using nextflow and the nohup command: 
 
 ```ruby
-#nohup bash _01_mag.sh &> $(date '+%Y%m%d')_mag01.log &
+nohup bash _01_mag.sh &> $(date '+%Y%m%d')_mag01.log &
 ```
 Similarly to what viralrecon, the directory is modified with new folders that store the data and results derived from the analysis: 
 
@@ -805,7 +795,6 @@ Now, /$(date '+%Y%m%d')_mag folder include the next directories regarding metagn
     └── kraken2
         ├── <sample_name>
 ```
-
 
 Summary of resulting data: 
 
@@ -1206,7 +1195,10 @@ Lineage
 See the [usage documentation](docs/usage.md) for all of the available options when running the pipeline.
 
 </details>    
-    
+
+## Tips
+
+
 ## Documentation
 
 The nf-core/viralrecon pipeline comes with documentation about the pipeline, found in the `docs/` directory:
