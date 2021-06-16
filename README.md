@@ -205,8 +205,6 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
     
 <details>
   <summary>Click here to see the Summary of the resulting data structure from virarecon_mapping folder</summary>
-    
-    
 ** Only directories.
 ```ruby
 .
@@ -294,9 +292,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
 **Directories + sample_name files
 
 <details>
-  <summary>Click here to see the Summary of the resulting data structure from </summary>
-
-    
+  <summary>Click here to see the Summary of the resulting data structure from </summary>  
 ```ruby
 
 ├── assembly
@@ -714,7 +710,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
             ├── 214704.snpEff.vcf.gz
             ├── 214704.snpEff.vcf.gz.tbi
             ├── 214704.snpSift.table.txt
-```
+```    
 <details>
     
 ----------------------
