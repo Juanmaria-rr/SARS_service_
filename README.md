@@ -19,7 +19,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 # Local data organization summary
 
-Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-Cov) and the name of the researcher, typically "SRVxxxx_date_SARS_>researcher_name>". 
+Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-CoV2) and the name of the researcher, typically "SRVxxxx_date_SARS_>researcher_name>". 
 
 In this folder there will be other directories: 
 
@@ -740,9 +740,9 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
 </details>
     
     
-** $(date '+%Y%m%d')_ANALYSIS02_MET.    
+**$(date '+%Y%m%d')_ANALYSIS02_MET**
 
-- Lablog
+**Lablog**
 
 Includes the commands to make symbolic links with 00-reads and samples_id.txt files from the main "Analysis" directory. It also has the nextflow run command neccesary to perform the metagenomic analysis using the main.nf file using the mag repository data taken from "/processing_Data/bioinformatics/pipelines/mag/main.nf", to make date_mag folder and performed the metagnomic classification using Kraken from "/processing_Data/bioinformatics/references/kraken/minikraken_8GB_20200312.tgz" included in the _01_mag.sh. As in viralrecon analysis, the output of _01_mag.sh will be redirected to a .log in order to follow the run. The content of the lablog is shown in the following lines: 
 
@@ -762,7 +762,7 @@ After this, the directory should be like this:
 └── samples_id.txt -> ../samples_id.txt
 ```
 
-***Launching metagenomic analysis analyses
+**Launching metagenomic analysis analyses**
 
 As seen for viralrecon analyses, we run this pipeline using nextflow and the nohup command: 
 
@@ -782,10 +782,10 @@ Similarly to what viralrecon, the directory is modified with new folders that st
 ├── samples_id.txt -> ../samples_id.txt
 └── work
 ```
-Now, /$(date '+%Y%m%d')_mag folder include the next directories regarding metagnomic analyses: 
+Now /$(date '+%Y%m%d')_mag folder include the next directories regarding metagnomic analyses: 
 
 ```bash
-.
+    
 ├── pipeline_info
 ├── QC_shortreads
 │   ├── fastp
@@ -1162,20 +1162,20 @@ Lineage
 | --- | --- |
 | `Host` | Human, Bison or bat |
 | `VirusSequence` | Reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2 |
-| `Total reads` | *.sorted.bam.flagstat |
-| `Reads_host_R1` | *.kraken2.report.txt |
-| `Reads_host_total` | 
-| `%_reads_host` | *.kraken2.report.txt |
-| `Reads_virus_total` |
-| `%_reads_virus` | *.sorted.bam.flagstat |
-| `Unmapped_reads` |
-| `%Unmapped_reads` |
-| `Mean DP Coverage ` | *.trim.CollectWgsMetrics.coverage_metrics |
-| `PCT_10X` | *.trim.CollectWgsMetrics.coverage_metrics |
+| `Total reads` | /variants/bam/samtools_stats/*.sorted.bam.flagstat |
+| `Reads_host_R1` | /assembly/kraken2/*.kraken2.report.txt |
+| `Reads_host_total` | /assembly/kraken2/*.kraken2.report.txt |
+| `%_reads_host` | /assembly/kraken2/*.kraken2.report.txt |
+| `Reads_virus_total` | /variants/bam/samtools_stats/*.sorted.bam.flagstat |
+| `%_reads_virus` | /variants/bam/samtools_stats/*.sorted.bam.flagstat |
+| `Unmapped_reads` | Estimated |
+| `%Unmapped_reads` | Estimated |
+| `Mean DP Coverage ` | /variants/bam/picard_metrics/*.trim.CollectWgsMetrics.coverage_metrics |
+| `PCT_10X` | /variants/bam/picard_metrics/*.trim.CollectWgsMetrics.coverage_metrics |
 | `Variants_consensusx10` | *.AF0.75.snpSift.table.txt | 
 | `Missense_variants` | *.AF0.75.snpSift.table.txt | 
-| `%Ns_10x` | percentajeNs.py |
-| `Lineage` | Pangolin |
+| `%Ns_10x` | %Ns.tab |
+| `Lineage` | pangolin/lineage_report.csv |
 
 <details>
     <summary>Click if you want to see a Quick Start guide to Nextflow</summary>
