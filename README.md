@@ -26,8 +26,8 @@ In this folder there will be other directories:
 ```ruby
 ├── ANALYSIS
 │   ├── 00-reads
-│   ├── <date>_ANALYSIS01_AMPLICONS_HUMAN
-│   └── <date>_ANALYSIS02_MET
+│   ├── $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN
+│   └── $(date '+%Y%m%d')_ANALYSIS02_MET
 ├── DOC
 ├── RAW
 │   └── <samples_folder>
