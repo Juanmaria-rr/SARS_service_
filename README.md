@@ -117,6 +117,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN.
     date_viralrecon_mapping
 
 ** Only directories.
+```ruby
 .
 ├── assembly
 │   ├── cutadapt
@@ -613,6 +614,8 @@ date_ANALYSIS01_AMPLICONS_HUMAN.
             ├── 214704.snpEff.vcf.gz
             ├── 214704.snpEff.vcf.gz.tbi
             ├── 214704.snpSift.table.txt
+```
+
 
 ----------------------
 
