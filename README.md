@@ -779,8 +779,8 @@ Now, /$(date '+%Y%m%d')_mag folder include the next directories regarding metagn
     └── kraken2
         ├── <sample_name>
 ```
-
-
+<details>
+    <summary> Click if you want to see a brief summary to the generic pipeline of viralrecon </summary>
 ## Pipeline summary
 
 Regarding the Analysis of variants (folder Analysis_01), samples are processed and analysed using viralrecon pipeline, which is run as follows: 
@@ -811,6 +811,8 @@ Regarding the Analysis of variants (folder Analysis_01), samples are processed a
         * Call variants relative to reference ([`Minimap2`](https://github.com/lh3/minimap2), [`seqwish`](https://github.com/ekg/seqwish), [`vg`](https://github.com/vgteam/vg), [`Bandage`](https://github.com/rrwick/Bandage))
         * Variant annotation ([`SnpEff`](http://snpeff.sourceforge.net/SnpEff.html), [`SnpSift`](http://snpeff.sourceforge.net/SnpSift.html))
 7. Present QC and visualisation for raw read, alignment, assembly and variant calling results ([`MultiQC`](http://multiqc.info/))
+
+</details>
 
 Summary of resulting data: 
 
@@ -1155,48 +1157,42 @@ Summary of resulting data:
 
 From the files generated after the two analyses (viralrecon and metagenomics), the next aim is to extract and mount in a tab separated file different data from both analyses that will give an overview of the metrics and summary results for every analyzed sample.
 
-
 Host 
-VirusSequence (reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2)
+VirusSequence 
 Sample
-Total reads (*.sorted.bam.flagstat)
-Reads_host R1 (*.kraken2.report.txt)
+Total reads
+Reads_host R1 
 Reads_host_total 
-%_reads_host (*.kraken.report.txt)
-Reads_virus_total (.sorted.bam.flagstat)
+%_reads_host 
+Reads_virus_total 
 %_reads_virus 
 Unmapped_reads 
 %Unmapped_reads
-Mean DP Coverage (*.trim.CollectWgsMetrics.coverage_metrics)
-PCT_10X (*.trim.CollectWgsMetrics.coverage_metrics)
-Variants_consensusx10 (*.AF0.75.snpSift.table.txt)
-Missense_variants (*.AF0.75.snpSift.table.txt)
-%Ns_10x (_Python_script)
-Lineage (Pangolin)
+Mean DP Coverage
+PCT_10X
+Variants_consensusx10
+Missense_variants
+%Ns_10x
+Lineage
 
 | Info | Source |
 | --- | --- |
 | `Host` | Human, Bison or bat |
 | `VirusSequence` | Reference genome, the first Wuhan SARS-CoV2 sequenced: NC_045512.2 |
-| `Total reads` | .sorted.bam.flagstat |
+| `Total reads` | *.sorted.bam.flagstat |
 | `Reads_host_R1` | *.kraken2.report.txt |
 | `Reads_host_total` | 
-| `%_reads_host` | *.kraken.report.txt |
+| `%_reads_host` | *.kraken2.report.txt |
 | `Reads_virus_total` |
-| `%_reads_virus` | .sorted.bam.flagstat |
+| `%_reads_virus` | *.sorted.bam.flagstat |
 | `Unmapped_reads` |
 | `%Unmapped_reads` |
 | `Mean DP Coverage ` | *.trim.CollectWgsMetrics.coverage_metrics |
 | `PCT_10X` | *.trim.CollectWgsMetrics.coverage_metrics |
 | `Variants_consensusx10` | *.AF0.75.snpSift.table.txt | 
 | `Missense_variants` | *.AF0.75.snpSift.table.txt | 
-| `%Ns_10x` | _Python_script |
+| `%Ns_10x` | percentajeNs.py |
 | `Lineage` | Pangolin |
-
-
-
-
-
 
 
 ## Quick Start
