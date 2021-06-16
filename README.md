@@ -198,6 +198,7 @@ date_ANALYSIS01_AMPLICONS_HUMAN.
         └── snpeff
         
 **Directories + sample_name
+```ruby
 
 ├── assembly
 │   ├── cutadapt
