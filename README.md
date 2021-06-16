@@ -23,6 +23,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-Cov) and the name of the researcher, typically "SRVxxxx_date_SARS_name-researcher". 
 In this folder there will be other directories: 
 
+```ruby
 .
 ├── ANALYSIS
 ├── DOC
@@ -30,7 +31,7 @@ In this folder there will be other directories:
 ├── REFERENCES
 ├── RESULTS
 └── TMP
-
+```
 
 In ANALYSIS folder is where all the analysis process will run. In RAW, inside a folder named with the RUN  there are the R1/2 fastq.gz files, where they will be taken from in order to perform the analysis. DOC, REFERENCES, RESULTS and TMP will be empty. 
 
