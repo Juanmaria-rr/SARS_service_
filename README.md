@@ -294,7 +294,7 @@ date_viralrecon_mapping
 **Directories + sample_name files
 
 <details>
-  <summary>Click here to see the Summary of the resulting data structure from </summary>  
+  <summary>Click here to see the Summary of the same data structure but including sample files</summary>  
    
 ```ruby
 
