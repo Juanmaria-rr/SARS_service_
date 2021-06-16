@@ -1190,7 +1190,7 @@ Lineage
 | `Lineage` | Pangolin |
 
 <details>
-    <summary>Click if you want to see a Quick Start guide to nextflow</summary>
+    <summary>Click if you want to see a Quick Start guide to Nextflow</summary>
 ## Quick Start
 
 1. Install [`nextflow`](https://nf-co.re/usage/installation)
