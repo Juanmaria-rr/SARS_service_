@@ -19,7 +19,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 # Local data organization summary
 
-Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-CoV2) and the name of the researcher, typically "SRVxxxx_date_SARS_>researcher_name>". 
+Once every service is ordered, a template of data structure is created, starting with a new folder with the name of the service, the date, the type of project (i.e. SARS-CoV2) and the name of the researcher, typically "SRVxxxx_date_SARS_<researcher_name>". 
 
 In this folder there will be other directories: 
 
@@ -147,7 +147,11 @@ $(date '+%Y%m%d')_ANALYSIS01_AMPLICONS_HUMAN/
 ``` 
 **Launching Viralrecon analysis**
 
-Once this, we are ready to run viralrecon analysis, which will be launched using nohup command in order to allow the computer to run other tasks independetly of our ssh conection: 
+Once this, we are ready to run viralrecon analysis. First, we need to activate the nextflow environment in conda, and then we will launch using nohup command in order to allow the computer to run other tasks independetly of our ssh conection: 
+
+```bash
+conda activate nextflow
+```
 
 ```bash
 nohup bash _01_viralrecon_mapping.sh &> $(date '+%Y%m%d')_mapping01.log &
@@ -1134,6 +1138,12 @@ Summary of resulting data:
 ```
 </details>
 
+** Calculation of Ns %**
+
+
+
+This data is derived from the analysis performed by the python script percentajeNs.py. To do so, we have to 
+
 ## Results and statistics. 
 
 From the files generated after the two analyses (viralrecon and metagenomics), the next aim is to extract and mount in a tab separated file different data from both analyses that will give an overview of the metrics and summary results for every analyzed sample.
@@ -1194,7 +1204,9 @@ cat samples_id.txt | while read in
 ```
 
 </details>
-    
+
+This script makes a file_st.tab file including all that information for every sample, if included in the  sample_id.txt list. 	
+
 <details>
     <summary>Click if you want to see a Quick Start guide to Nextflow</summary>
 ## Quick Start
@@ -1216,6 +1228,8 @@ See the [usage documentation](docs/usage.md) for all of the available options wh
 </details>    
 
 ## Tips
+
+> If nextflow run is stopped by an error, you should remove the folders work/ and .nextflow/, and the .log file, before the next attempt to launch nextflow pipeline from the ANALYSIS folder. 
 
 
 ## Documentation
