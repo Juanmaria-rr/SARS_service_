@@ -9,7 +9,7 @@
 [![Docker](https://img.shields.io/docker/automated/nfcore/viralrecon.svg)](https://hub.docker.com/r/nfcore/viralrecon)
 [![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23viralrecon-4A154B?logo=slack)](https://nfcore.slack.com/channels/viralrecon)
 
-## Introduction
+# Introduction
 
 **viralrecon_BU-ISCIII** is a bioinformatics analysis pipeline derived from nf-core/viralrecon one, which is used to perform assembly and intra-host/low-frequency variant calling for viral samples. This pipeline, similarly to what developed from nf-core/viralrecon, supports short-read Illumina sequencing data from both shotgun (e.g. sequencing directly from clinical samples) and enrichment-based library preparation methods (e.g. amplicon-based: [ARTIC SARS-CoV-2 enrichment protocol](https://artic.network/ncov-2019); or probe-capture-based). 
 
@@ -23,7 +23,7 @@ Once every service is ordered, a template of data structure is created, starting
 
 In this folder there will be other directories: 
 
-```ruby
+```bash
 SRVxxxx_date_SARS_>researcher_name>
 ├── ANALYSIS
 │   ├── 00-reads
