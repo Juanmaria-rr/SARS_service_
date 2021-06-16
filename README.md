@@ -204,7 +204,8 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
     
     
 <details>
-  <report>Click here to see the Summary of the resulting data structure from virarecon_mapping folder</report>
+  <summary>Click here to see the Summary of the resulting data structure from virarecon_mapping folder</summary>
+    
 ** Only directories.
 ```ruby
 .
@@ -286,13 +287,14 @@ date_ANALYSIS01_AMPLICONS_HUMAN/20210603_viralrecon_mapping
         │       └── icarus_viewers
         └── snpeff
 
-<report>
+<summary>
 
     
 **Directories + sample_name files
 
 <details>
   <summary>Click here to see the Summary of the resulting data structure from </summary>  
+    
 ```ruby
 
 ├── assembly
